@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:itemIconTint="@color/colorIcons"
+    app:theme="@style/ToolBarStyle">
+
+    <item
+        android:id="@+id/items_share"
+        android:icon="@drawable/ic_menu_share"
+        app:showAsAction="ifRoom|withText"
+        android:title="Delete"
+        android:titleCondensed="Delete">
+    </item>
+
+    <item
+        android:id="@+id/items_add_note"
+        android:icon="@drawable/ic_note_add_black_48dp"
+        app:showAsAction="ifRoom"
+        android:title="Delete"
+        android:titleCondensed="Delete">
+    </item>
+</menu>

@@ -1,0 +1,38 @@
+<resources>
+    <string name="app_name">Bhaibheri Dzvene MuChishona</string>
+
+    <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
+    <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
+
+    <string name="action_settings" translatable="false">Settings</string>
+    <string name="settings" translatable="false">Settings</string>
+    <string name="hymns">Hymns</string>
+    <string name="read_new_testament">Read New Testament</string>
+    <string name="old_testament">Read Old Testament</string>
+    <string name="devotional">Today\'s Word</string>
+    <string name="developers">Developers</string>
+    <string name="share_app" translatable="false">Share App</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="language_key" translatable="false">language_key</string>
+    <string name="books_key" translatable="false">books_key</string>
+    <string name="hint_search">Search</string>
+    <string name="shona" translatable="false">Shona</string>
+    <string name="english" translatable="false">English</string>
+    <string name="day_night" translatable="false">Day / Night</string>
+    <string name="translate" translatable="false">Translate</string>
+    <string name="search">Search</string>
+    <string name="about">About</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
+    <string name="notes">Notes</string>
+    <string name="save" translatable="false">Save</string>
+    <string name="cancel" translatable="false">Cancel</string>
+    <string name="confirm_delete">Are you sure you want to delete these items?</string>
+    <string name="delete" translatable="false">delete</string>
+    <string name="add_note" translatable="false">Add Note</string>
+    <string name="note_title" translatable="false">Note Title</string>
+    <string name="yesterday_devotional">Yesterday</string>
+    <string name="next">Next</string>
+</resources>

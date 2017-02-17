@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Holy Bible</string>
+    <string name="developers">Support</string>
+    <string name="devotional">Today\'s Word</string>
+    <string name="hint_search">Search</string>
+    <string name="hymns">Hymns</string>
+    <string name="old_testament">Old Testament</string>
+    <string name="read_new_testament">New Testament</string>
+    <string name="search">Search</string>
+    <string name="about">About</string>
+    <string name="confirm_delete">Are you sure you want to delete these items?</string>
+    <string name="notes">Notes</string>
+    <string name="yesterday_devotional">Yesterday\'s Text</string>
+</resources>

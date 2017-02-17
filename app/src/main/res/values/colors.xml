@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--<color name="colorPrimary">#3F51B5</color>-->
+    <!--<color name="colorPrimaryDark">#303F9F</color>-->
+    <!--<color name="colorAccent">#FF4081</color>-->
+
+    <color name="colorPrimary">#D50000</color>
+    <color name="colorPrimaryDark">#B71C1C</color>
+    <color name="colorPrimaryLight">#FFCDD2</color>
+    <color name="colorAccent">#deef5350</color>
+    <color name="colorPrimaryText">#000</color>
+    <color name="colorSecondaryText">#101010</color>
+    <color name="colorIcons">#111</color>
+    <color name="colorDivider">#BDBDBD</color>
+    <color name="spinnerBackground">@android:color/background_dark</color>
+    <color name="colorBackground">#EdEdEd</color>
+
+    <!-- Customize your theme here. -->
+    <!--<item name="colorPrimary">@color/colorPrimary</item>-->
+    <!--<item name="colorPrimaryDark">@color/colorPrimaryDark</item>-->
+    <!--<item name="colorAccent">@color/colorAccent</item>-->
+    <!--<item name="android:textColorSecondary">@android:color/white</item>-->
+    <!--<item name="colorPrimaryText">@color/colorPrimaryText</item>-->
+    <!--<item name="colorSecondaryText">@color/colorSecondaryText</item>-->
+    <!--<item name="colorIcons">@color/colorIcons</item>-->
+    <!--<item name="colorDivider">@color/colorDivider</item>-->
+    <!--<item name="android:actionButtonStyle">@style/ActionButtonStyle</item>-->
+
+</resources>

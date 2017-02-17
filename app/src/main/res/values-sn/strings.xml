@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Bhaibheri Dzvene</string>
+    <string name="developers">Rubatsiro</string>
+    <string name="devotional">Shoko Ranhasi</string>
+    <string name="hint_search">Tsvaga</string>
+    <string name="hymns">Nziyo</string>
+    <string name="old_testament">Testamende Yekare</string>
+    <string name="read_new_testament">Testamende Itsva</string>
+    <string name="search">Tsvaga</string>
+    <string name="about">About</string>
+    <string name="confirm_delete">Dzima Zvachose</string>
+    <string name="notes">Manotsi</string>
+    <string name="yesterday_devotional">Chidzidzo Chanezuro</string>
+</resources>
