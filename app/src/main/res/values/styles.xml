@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.DayNight">
@@ -13,14 +13,14 @@
         <!--<item name="colorDivider">@color/colorDivider</item>-->
         <item name="holoSpinnerStyle">@style/Widget.AppCompat.Spinner</item>
         <!--<item name="spinnerDropDownItemStyle">@style/Widget.AppCompat.Spinner</item>-->
-        <item name="android:actionButtonStyle">@style/ActionButtonStyle</item>
+        <!--<item name="android:actionButtonStyle">@style/ActionButtonStyle</item>-->
     </style>
 
     <style name="AppTheme.NoActionBar" parent="AppTheme">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="windowActionModeOverlay">true</item>
-        <item name="android:actionButtonStyle">@style/ActionButtonStyle</item>
+        <!--<item name="android:actionButtonStyle">@style/ActionButtonStyle</item>-->
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="AppTheme" />
@@ -35,11 +35,11 @@
 
     <!--<style name="AppTheme.AppTheme.DayNight" parent="Theme.AppCompat.DayNight" />-->
 
-    <style name="ActionButtonStyle" parent="@android:style/Widget.Holo.Light.ActionButton">
-        <item name="android:minWidth">0dip</item>
-        <item name="android:paddingLeft">0dip</item>
-        <item name="android:paddingRight">0dip</item>
-    </style>
+    <!--<style name="ActionButtonStyle" parent="@android:style/Widget.Holo.Light.ActionButton">-->
+        <!--<item name="android:minWidth">0dip</item>-->
+        <!--<item name="android:paddingLeft">0dip</item>-->
+        <!--<item name="android:paddingRight">0dip</item>-->
+    <!--</style>-->
 
     <!-- ToolBar -->
     <style name="ToolBarStyle" parent="AppTheme">
@@ -52,6 +52,26 @@
 
     <style name="MyTheme">
         <item name="holoSpinnerStyle">@style/Widget.AppCompat.Spinner</item>
+    </style>
+
+    <style name="dialogTitleStyle">
+        <item name="android:paddingTop">5dp</item>
+        <item name="android:paddingBottom">5dp</item>
+        <item name="android:background">@color/colorPrimary</item>
+        <item name="android:textColor">@color/colorPrimaryText</item>
+        <item name="android:textAppearance">@style/Base.TextAppearance.AppCompat.Large</item>
+    </style>
+
+    <style name="buttonStyle">
+        <item name="android:textColor">@color/colorButtonText</item>
+        <item name="android:background">@drawable/rectangle_background</item>
+        <item name="android:layout_margin">2dp</item>
+        <item name="android:textAppearance">@style/Base.TextAppearance.AppCompat.Medium</item>
+        <item name="android:textAllCaps" tools:targetApi="ice_cream_sandwich">false</item>
+    </style>
+
+    <style name="dialogFullSize" parent="Theme.AppCompat.Dialog">
+        <item name="android:windowBackground">@android:color/white</item>
     </style>
 
 </resources>

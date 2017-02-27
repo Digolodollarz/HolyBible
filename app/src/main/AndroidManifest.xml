@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="tech.diggle.apps.bible.bhaibheridzvenemuchishona">
 
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!--<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />-->
 
     <application
         android:name=".MyApp"

@@ -21,6 +21,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.zip.ZipInputStream;
 
 import tech.diggle.apps.bible.bhaibheridzvenemuchishona.R;
@@ -35,7 +37,7 @@ import static tech.diggle.apps.bible.bhaibheridzvenemuchishona.Helpers.BibleData
 public class BibleDBHelper extends SQLiteAssetHelper {
 
     private static final String DATABASE_NAME = "bible-data.db";
-    private static final int DATABASE_VERSION = 18;
+    private static final int DATABASE_VERSION = 21;
     private boolean needsUpgrade = false;
     private String bibleTextTable = "t_bbe";
     private String booksKeyTable = "key_english";
@@ -43,6 +45,8 @@ public class BibleDBHelper extends SQLiteAssetHelper {
     private String devotionalColumn = "en";
     private String devotionalTable = "devotional";
     private String TEMP_DATABASE_NAME = "bible-data-new.db";
+    private static final String FTS_VIRTUAL_TABLE = "FTS";
+    private String fts_table;
 
     public BibleDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -59,14 +63,27 @@ public class BibleDBHelper extends SQLiteAssetHelper {
                 Context.MODE_PRIVATE);
         booksKeyTable = sharedPref.getString(context.getString(R.string.books_key), "key_english");
         bibleTextTable = sharedPref.getString(context.getString(R.string.language_key), "t_bbe");
+//        TODO: Initialise the FTS4 tables
+        fts_table = sharedPref.getString("fts_key", "fts_t_english");
         Log.d("Initialising :" + bibleTextTable, "key: " + booksKeyTable);
 //        setForcedUpgrade(50);
         SQLiteDatabase db = getWritableDatabase();
         if (needsUpgrade) {
             upgradeDB();
+            createFtsTable();
         }
-
+        if (sharedPref.getBoolean("databaseNotInitialised", true)) {
+            try {
+                createFtsTable();
+                sharedPref.edit().putBoolean("databaseNotInitialised", false).apply();
+            } catch (Exception e) {
+                Log.d("BibleDBHelper","Error Initialising database");
+                e.printStackTrace();
+            }
+        }
+        mAssetPath = "databases" + "/" + DATABASE_NAME;
     }
+
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -76,7 +93,7 @@ public class BibleDBHelper extends SQLiteAssetHelper {
 //        SQLiteDatabase dbTemp = SQLiteDatabase.openDatabase(path, null, SQLiteDatabase.OPEN_READWRITE);
     }
 
-    public boolean upgradeDB() {
+    private boolean upgradeDB() {
         Log.i("DiggleTechApps", "Database Upgrading to newVersion");
         SQLiteDatabase db = getWritableDatabase();
         try {
@@ -87,6 +104,8 @@ public class BibleDBHelper extends SQLiteAssetHelper {
             db.execSQL("ATTACH '" + path + "' AS TEMPo");
 //            db.beginTransaction();
             db.execSQL("INSERT or REPLACE INTO devotional SELECT * FROM TEMPo.devotional");
+            db.execSQL("INSERT OR REPLACE INTO t_bbe SELECT * FROM TEMPo.t_bbe");
+            db.execSQL("INSERT OR REPLACE INTO t_shona SELECT * FROM TEMPo.t_shona");
         } catch (SQLiteAssetException e) {
             e.printStackTrace();
             return false;
@@ -137,6 +156,23 @@ public class BibleDBHelper extends SQLiteAssetHelper {
                 bibleTextTable + ".c = '" + chapter + "'";
         Log.d("getVerses Text :" + bibleTextTable, "key: " + booksKeyTable);
         qb.setTables(bibleTextTable + " INNER JOIN " + booksKeyTable + " ON " + bibleTextTable + ".b = " + booksKeyTable + ".b");
+        Cursor c = qb.query(db, sqlSelect, whereToGet, null,
+                null, null, null);
+        c.moveToFirst();
+        Log.d("THisIsALOG", "getVerses: " + c);
+        return c;
+    }
+
+    public Cursor getVersesByInt(int book, int chapter) {
+
+
+//        String localBook = getBookName(getBookId(bookName));
+        SQLiteDatabase db = getReadableDatabase();
+        SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+        String[] sqlSelect = {"0 _id", "v", "t"};
+        String whereToGet = "b = '" + book + "' AND c = '" + chapter + "'";
+        Log.d("getVerses Text :" + bibleTextTable, "key: " + booksKeyTable);
+        qb.setTables(bibleTextTable);// + " INNER JOIN " + booksKeyTable + " ON " + bibleTextTable + ".b = " + booksKeyTable + ".b");
         Cursor c = qb.query(db, sqlSelect, whereToGet, null,
                 null, null, null);
         c.moveToFirst();
@@ -217,7 +253,7 @@ public class BibleDBHelper extends SQLiteAssetHelper {
         Cursor c = getReadableDatabase().rawQuery("SELECT b from " +
                 booksKeyTable +
                 " WHERE n = '" + bookName + "'", null);
-        int rValue = 0;
+        int rValue;
         if (c.moveToFirst()) {
             rValue = c.getInt(c.getColumnIndex("b"));
         } else {
@@ -307,16 +343,15 @@ public class BibleDBHelper extends SQLiteAssetHelper {
         String[] columns = new String[]{"mesage"};
         //an array list of cursor to save two cursors one has results from the query
         //other cursor stores error message if any errors are triggered
-        ArrayList<Cursor> alc = new ArrayList<Cursor>(2);
+        ArrayList<Cursor> alc = new ArrayList<>(2);
         MatrixCursor Cursor2 = new MatrixCursor(columns);
         alc.add(null);
         alc.add(null);
 
 
         try {
-            String maxQuery = Query;
             //execute the query results will be save in Cursor c
-            Cursor c = sqlDB.rawQuery(maxQuery, null);
+            Cursor c = sqlDB.rawQuery(Query, null);
 
 
             //add value to cursor2
@@ -351,7 +386,7 @@ public class BibleDBHelper extends SQLiteAssetHelper {
 
     }
 
-    public String getBookName(int bookId) {
+    String getBookName(int bookId) {
         Cursor c = getReadableDatabase().rawQuery("SELECT n from " +
                 booksKeyTable +
                 " WHERE b = " + bookId, null);
@@ -380,17 +415,12 @@ public class BibleDBHelper extends SQLiteAssetHelper {
     }
 
     private static final String TAG = SQLiteAssetHelper.class.getSimpleName();
-
     private final Context mContext;
-
-
-    private String mDatabasePath;
-
-    String mAssetPath = "databases" + "/" + DATABASE_NAME;
+    private String mAssetPath;
 
     private void copyDatabaseFromAssets() throws SQLiteAssetException {
         Log.w(TAG, "copying database from assets...");
-        mDatabasePath = mContext.getApplicationInfo().dataDir + "/databases";
+        String mDatabasePath = mContext.getApplicationInfo().dataDir + "/databases";
         String path = mAssetPath;
         String dest = mDatabasePath + "/" + TEMP_DATABASE_NAME;
         InputStream is;
@@ -439,4 +469,40 @@ public class BibleDBHelper extends SQLiteAssetHelper {
             throw se;
         }
     }
+
+    //<editor-fold desc="Create and search from FTS4 table">
+    //    Provide FTS4 on devices with API level greater than 11 only
+//    TODO: Add the search functionality to devices below the API. Probably never gonna happen ;)
+    private void createFtsTable() {
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL("CREATE VIRTUAL TABLE fts_t_shona USING fts4 (content='t_shona', v)");
+        db.execSQL("INSERT INTO fts_t_shona(fts_t_shona) VALUES('rebuild')");
+        db.execSQL("CREATE VIRTUAL TABLE fts_t_english USING fts4 (content='t_bbe', v)");
+        db.execSQL("INSERT INTO fts_t_english(fts_t_english) VALUES('rebuild')");
+    }
+
+//    public Cursor fullTextSearch(String search) {
+//        SQLiteDatabase db = getReadableDatabase();
+//        String queryArgs[] = {search.trim().replaceAll(" ", " NEAR/2 ")};
+//        Log.d("Search Term :", queryArgs[0]);
+////        StringBuilder queryArgsSb = new StringBuilder("");
+////        String[] searchTerms = search.split(" ");
+////        if (searchTerms.length > 1) {
+////            queryArgsSb.append(searchTerms[0]);
+////            List<String> thisPne = Arrays.asList(searchTerms);
+////            thisPne.remove(0);
+////            searchTerms = (thisPne).toArray(new String[0]);
+////            for (String searchTerm : searchTerms) {
+////                queryArgsSb.append(searchTerm);
+////            }
+////        } else {
+////            queryArgs = search;
+////        }
+//        Cursor cursor = db.rawQuery("SELECT n , v FROM "
+//                            +fts_table+ " WHERE " +fts_table+
+//                            " MATCH ?", queryArgs);
+//        cursor.close();
+//        return cursor;
+//    }
+    //</editor-fold>
 }

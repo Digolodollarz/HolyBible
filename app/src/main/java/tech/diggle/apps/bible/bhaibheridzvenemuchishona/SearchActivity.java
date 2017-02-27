@@ -2,10 +2,16 @@ package tech.diggle.apps.bible.bhaibheridzvenemuchishona;
 
 import android.app.SearchManager;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.CharArrayBuffer;
+import android.database.ContentObserver;
 import android.database.Cursor;
+import android.database.DataSetObserver;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SimpleCursorAdapter;
@@ -23,8 +29,8 @@ import tech.diggle.apps.bible.bhaibheridzvenemuchishona.Helpers.BibleDBHelper;
 
 public class SearchActivity extends AppCompatActivity
         implements SearchView.OnQueryTextListener{
-    private SimpleCursorAdapter adapter;
-    Cursor employees;
+    private SimpleCursorAdapter resultsAdapter;
+    Cursor versesCursor;
     BibleDBHelper db;
     ListView listView;
     String query = "Finde";
@@ -49,29 +55,236 @@ public class SearchActivity extends AppCompatActivity
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             query = intent.getStringExtra(SearchManager.QUERY);
             Toast.makeText(this, "Searching by: " + query, Toast.LENGTH_SHORT).show();
-            employees = db.searchVerses(query); // you would not typically call this on the main thread
+//            versesCursor = db.searchVerses(query); // you would not typically call this on the main thread
+
         }
         else{
             query = intent.getStringExtra("com.diggle.apps.bhaibheri.searchText");
-            employees = db.searchVerses(query); // you would not typically call this on the main thread
+//            versesCursor = db.searchVerses(query); // you would not typically call this on the main thread
         }
 
-        this.setTitle(query);
+        this.setTitle("Find:" + query);
 
         if (getSupportActionBar()!=null) {
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
 //        getSupportActionBar().setIcon(R.drawable.ic_launcher);
+        versesCursor = new Cursor() {
+            @Override
+            public int getCount() {
+                return 0;
+            }
 
-        adapter = new SimpleCursorAdapter(this,
+            @Override
+            public int getPosition() {
+                return 0;
+            }
+
+            @Override
+            public boolean move(int i) {
+                return false;
+            }
+
+            @Override
+            public boolean moveToPosition(int i) {
+                return false;
+            }
+
+            @Override
+            public boolean moveToFirst() {
+                return false;
+            }
+
+            @Override
+            public boolean moveToLast() {
+                return false;
+            }
+
+            @Override
+            public boolean moveToNext() {
+                return false;
+            }
+
+            @Override
+            public boolean moveToPrevious() {
+                return false;
+            }
+
+            @Override
+            public boolean isFirst() {
+                return false;
+            }
+
+            @Override
+            public boolean isLast() {
+                return false;
+            }
+
+            @Override
+            public boolean isBeforeFirst() {
+                return false;
+            }
+
+            @Override
+            public boolean isAfterLast() {
+                return false;
+            }
+
+            @Override
+            public int getColumnIndex(String s) {
+                return 0;
+            }
+
+            @Override
+            public int getColumnIndexOrThrow(String s) throws IllegalArgumentException {
+                return 0;
+            }
+
+            @Override
+            public String getColumnName(int i) {
+                return null;
+            }
+
+            @Override
+            public String[] getColumnNames() {
+                return new String[0];
+            }
+
+            @Override
+            public int getColumnCount() {
+                return 0;
+            }
+
+            @Override
+            public byte[] getBlob(int i) {
+                return new byte[0];
+            }
+
+            @Override
+            public String getString(int i) {
+                return null;
+            }
+
+            @Override
+            public void copyStringToBuffer(int i, CharArrayBuffer charArrayBuffer) {
+
+            }
+
+            @Override
+            public short getShort(int i) {
+                return 0;
+            }
+
+            @Override
+            public int getInt(int i) {
+                return 0;
+            }
+
+            @Override
+            public long getLong(int i) {
+                return 0;
+            }
+
+            @Override
+            public float getFloat(int i) {
+                return 0;
+            }
+
+            @Override
+            public double getDouble(int i) {
+                return 0;
+            }
+
+            @Override
+            public int getType(int i) {
+                return 0;
+            }
+
+            @Override
+            public boolean isNull(int i) {
+                return false;
+            }
+
+            @Override
+            public void deactivate() {
+
+            }
+
+            @Override
+            public boolean requery() {
+                return false;
+            }
+
+            @Override
+            public void close() {
+
+            }
+
+            @Override
+            public boolean isClosed() {
+                return false;
+            }
+
+            @Override
+            public void registerContentObserver(ContentObserver contentObserver) {
+
+            }
+
+            @Override
+            public void unregisterContentObserver(ContentObserver contentObserver) {
+
+            }
+
+            @Override
+            public void registerDataSetObserver(DataSetObserver dataSetObserver) {
+
+            }
+
+            @Override
+            public void unregisterDataSetObserver(DataSetObserver dataSetObserver) {
+
+            }
+
+            @Override
+            public void setNotificationUri(ContentResolver contentResolver, Uri uri) {
+
+            }
+
+            @Override
+            public Uri getNotificationUri() {
+                return null;
+            }
+
+            @Override
+            public boolean getWantsAllOnMoveCalls() {
+                return false;
+            }
+
+            @Override
+            public void setExtras(Bundle bundle) {
+
+            }
+
+            @Override
+            public Bundle getExtras() {
+                return null;
+            }
+
+            @Override
+            public Bundle respond(Bundle bundle) {
+                return null;
+            }
+        };
+
+        new Initialise().execute(query);
+        resultsAdapter = new SimpleCursorAdapter(this,
                 R.layout.search_result_list_item,
-                employees,
+                versesCursor,
                 from,
                 to,
                 0);
         listView = (ListView) findViewById(R.id.listViewSearch);
-        listView.setAdapter(adapter);
-
+        listView.setAdapter(resultsAdapter);
         // OnCLickListener For List Items (done)
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -180,9 +393,7 @@ public class SearchActivity extends AppCompatActivity
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-        employees = db.searchVerses(query);
-        adapter.swapCursor(employees);
-        adapter.notifyDataSetChanged();
+        new SearchDB().execute(query);
         this.query = query;
         return false;
     }
@@ -193,27 +404,56 @@ public class SearchActivity extends AppCompatActivity
         return false;
     }
 
+    private class SearchDB extends AsyncTask<String, Void, Void>{
+
+        @Override
+        protected Void doInBackground(String... queries) {
+            String query = queries[0];
+            versesCursor = db.searchVerses(query);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            resultsAdapter.swapCursor(versesCursor);
+            resultsAdapter.notifyDataSetChanged();
+        }
+    }
+
     @Override
     protected void onNewIntent(Intent intent) {
         //super.onNewIntent(intent);
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             query = intent.getStringExtra(SearchManager.QUERY);
             Toast.makeText(this, "Searching by: " + query, Toast.LENGTH_SHORT).show();
-            employees = db.searchVerses(query);
+            versesCursor = db.searchVerses(query);
             return;
         } else if (Intent.ACTION_VIEW.equals(intent.getAction())) {
             query = intent.getStringExtra(SearchManager.QUERY);
-            Toast.makeText(this, "Searching by: " + query, Toast.LENGTH_SHORT).show();
-            employees = db.searchVerses(query);
+            Toast.makeText(this, "Searched by: " + query, Toast.LENGTH_SHORT).show();
+            versesCursor = db.searchVerses(query);
             return;
         }
     }
 
-    void updateDb(){
-        db = new BibleDBHelper(this);
-        Cursor cursor = db.searchVerses(query);
-        adapter.swapCursor(cursor);
-        adapter.notifyDataSetChanged();
+    private class Initialise extends AsyncTask<String, Void, Cursor>{
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Cursor doInBackground(String... queries) {
+            String query = queries[0];
+            versesCursor = db.searchVerses(query);
+            return versesCursor;
+        }
+
+        @Override
+        protected void onPostExecute(Cursor cursor) {
+            resultsAdapter.swapCursor(versesCursor);
+            resultsAdapter.notifyDataSetChanged();
+        }
     }
 
 //    @Override

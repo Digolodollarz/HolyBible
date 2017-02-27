@@ -14,7 +14,7 @@
         android:id="@+id/action_translate"
         android:icon="@drawable/ic_translate_white_48dp"
         android:title="@string/translate"
-        app:showAsAction="ifRoom">
+        app:showAsAction="always">
         <menu>
             <item android:title="@string/shona"
                 android:id="@+id/action_language_shona"/>

@@ -11,5 +11,5 @@
     <string name="about">About</string>
     <string name="confirm_delete">Are you sure you want to delete these items?</string>
     <string name="notes">Notes</string>
-    <string name="yesterday_devotional">Yesterday\'s Text</string>
+    <string name="close">Close</string>
 </resources>

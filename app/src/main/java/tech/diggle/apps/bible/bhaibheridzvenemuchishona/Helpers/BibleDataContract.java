@@ -12,6 +12,8 @@ public final class BibleDataContract {
     private static final String TEXT_TYPE          = " TEXT";
     private static final String COMMA_SEP          = ",";
     private static final String INT_TYPE           = " INTEGER";
+    public static final String BOOK = "BOOK";
+    public static final String CHAPTER = "CHAPTER";
 
     private BibleDataContract() {
     }

@@ -30,6 +30,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import tech.diggle.apps.bible.bhaibheridzvenemuchishona.Helpers.BibleDBHelper;
+import tech.diggle.apps.bible.bhaibheridzvenemuchishona.Helpers.BibleDataContract;
 import tech.diggle.apps.bible.bhaibheridzvenemuchishona.Helpers.ReadCursorAdapter;
 import tech.diggle.apps.bible.bhaibheridzvenemuchishona.R;
 
@@ -78,7 +79,7 @@ public class DevotionalFragment extends Fragment {
             if (getArguments().getString("TITLE") != null) {
                 ((TextView) view.findViewById(R.id.tvDevotionalTitle)).setText(getArguments().getString("TITLE"));
             } else {
-                ((TextView) view.findViewById(R.id.tvDevotionalTitle)).setVisibility(GONE);
+                view.findViewById(R.id.tvDevotionalTitle).setVisibility(GONE);
             }
         }
         calendar = Calendar.getInstance();
@@ -459,20 +460,22 @@ public class DevotionalFragment extends Fragment {
                             clickDetails.startVerse = Integer.parseInt(sbDevotionalText.substring(0, sbDevotionalText.indexOf("]")));
                             sbDevotionalText.delete(0, sbDevotionalText.indexOf("]") + 1);
                         }
-                        final String book = clickDetails.bookName;
+                        final String bookName = clickDetails.bookName;
+                        final int book = db.getBookId(bookName);
                         final int chapter = clickDetails.chapter;
                         final int startVerse = clickDetails.startVerse;
 
                         Button readVerse = (Button) view.findViewById(R.id.btnReadSource);
-                        readVerse.setText(book + " " + chapter + " " + startVerse);
+                        readVerse.setText("Read " +bookName + " " + chapter + " : " + startVerse);
                         readVerse.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                DialogFragment newFragment = ReadFragment.newInstance();
+                                DialogFragment newFragment = ShowChapterFragment.newInstance();
                                 Bundle args = new Bundle();
-                                args.putInt("CHAPTER", chapter);
-                                args.putInt("VERSE", startVerse);
-                                args.putString("BOOK", book);
+                                args.putInt(BibleDataContract.CHAPTER, chapter);
+                                args.putInt("START_VERSE", startVerse);
+                                args.putInt(BibleDataContract.BOOK, book);
+                                args.putString("BOOK_NAME", bookName);
                                 args.putInt("LAST_VERSE", 0);
                                 newFragment.setArguments(args);
                                 newFragment.show(getActivity().getSupportFragmentManager(), "dialog");
@@ -600,7 +603,8 @@ public class DevotionalFragment extends Fragment {
                             clickDetails.startVerse = Integer.parseInt(sbDevotionalText.substring(0, sbDevotionalText.indexOf("]")));
                             sbDevotionalText.delete(0, sbDevotionalText.indexOf("]") + 1);
                         }
-                        final String book = clickDetails.bookName;
+                        final String bookName = clickDetails.bookName;
+                        final int book = db.getBookId(bookName);
                         final int chapter = clickDetails.chapter;
                         final int startVerse = clickDetails.startVerse;
 
@@ -619,7 +623,8 @@ public class DevotionalFragment extends Fragment {
                                 Bundle args = new Bundle();
                                 args.putInt("CHAPTER", chapter);
                                 args.putInt("VERSE", startVerse);
-                                args.putString("BOOK", book);
+                                args.putInt("BOOK", book);
+                                args.putString("BOOK_NAME", bookName);
                                 args.putInt("LAST_VERSE", 0);
                                 newFragment.setArguments(args);
                                 newFragment.show(getActivity().getSupportFragmentManager(), "dialog");

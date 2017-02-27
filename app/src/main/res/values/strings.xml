@@ -33,6 +33,7 @@
     <string name="delete" translatable="false">delete</string>
     <string name="add_note" translatable="false">Add Note</string>
     <string name="note_title" translatable="false">Note Title</string>
-    <string name="yesterday_devotional">Yesterday</string>
-    <string name="next">Next</string>
+    <string name="next" translatable="false">Next</string>
+    <string name="previous" translatable="false">Previous</string>
+    <string name="close">Close</string>
 </resources>

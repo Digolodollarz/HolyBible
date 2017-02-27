@@ -23,7 +23,8 @@
                 android:layout_gravity="center_horizontal"
                 android:textAppearance="@android:style/TextAppearance.Large"
                 android:textAlignment="center"
-                android:background="@color/colorAccent"/>
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -35,11 +36,16 @@
                 android:visibility="gone" />
 
             <Button
-                android:text="Button"
-                android:layout_width="match_parent"
+                android:text=""
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/btnReadSource"
-                android:visibility="gone" />
+                android:visibility="gone"
+                style="@style/buttonStyle"
+                android:layout_gravity="center"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:elevation="2dp"/>
 
             <View
                 android:layout_width="1dp"
@@ -53,18 +59,20 @@
                 android:layout_gravity="bottom">
 
                 <Button
-                    android:text="@string/yesterday_devotional"
+                    android:text="@string/previous"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:id="@+id/btnReadYesterday"
-                    android:layout_weight="1" />
+                    android:layout_weight="1"
+                    style="@style/buttonStyle"/>
 
                 <Button
                     android:text="@string/next"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:id="@+id/btnReadNext"
-                    android:layout_weight="1" />
+                    android:layout_weight="1"
+                    style="@style/buttonStyle"/>
             </LinearLayout>
 
         </LinearLayout>

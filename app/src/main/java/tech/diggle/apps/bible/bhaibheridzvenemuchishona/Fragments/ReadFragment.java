@@ -149,9 +149,9 @@ public class ReadFragment extends DialogFragment {
                         if (checked.valueAt(i)) {
                             if (isFirst) {
                                 isFirst = false;
-                                startVerse = checked.keyAt(i);
+                                startVerse = checked.keyAt(i) + 1;
                             }
-                            endVerse = checked.keyAt(i);
+                            endVerse = checked.keyAt(i) + 1;
                             int pos = checked.keyAt(i);
                             toShareItems += adapter.getVerse(pos) + "\n";
                         }
@@ -317,13 +317,15 @@ public class ReadFragment extends DialogFragment {
     }
 
     public static DialogFragment newInstance() {
-        return new ReadFragment();
+        DialogFragment frag = new ReadFragment();
+        frag.setStyle(DialogFragment.STYLE_NORMAL, R.style.dialogFullSize);
+        return frag;
     }
 
     // add items into spinner dynamically
     public void addItemsToBooksSpinner() {
         Cursor booksCursor = db.getBooks();
-        ArrayList<String> bookNamesArray=new ArrayList<String>();
+        ArrayList<String> bookNamesArray= new ArrayList<>();
         if (booksCursor.moveToFirst()) {
             do {
                 bookNamesArray.add(booksCursor.getString(1)); //<< pass column index here instead of i
@@ -340,8 +342,7 @@ public class ReadFragment extends DialogFragment {
             public void onItemSelected(AdapterView<?> adapterView, View v,
                                        int position, long id) {
                 // On selecting a spinner item
-                String item = adapterView.getItemAtPosition(position).toString();
-                bookName = item;
+                bookName = adapterView.getItemAtPosition(position).toString();
                 verses = db.getVerses(bookName ,chapter);
                 adapter.swapCursor(verses);
                 adapter.notifyDataSetChanged();
@@ -358,7 +359,7 @@ public class ReadFragment extends DialogFragment {
 
     public void addItemsToChapterSpinner() {
         Cursor chaptersCursor = db.getChapters(bookName);
-        ArrayList<String> chaptersArray=new ArrayList<String>();
+        ArrayList<String> chaptersArray= new ArrayList<>();
         if (chaptersCursor.moveToFirst()) {
             do {
                 chaptersArray.add(chaptersCursor.getString(1)); //<< pass column index here instead of i
