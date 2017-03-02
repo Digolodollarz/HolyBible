@@ -53,7 +53,7 @@ public class DevotionalFragment extends Fragment {
     Context context;
     BibleDBHelper db;
     final String[] from = new String[]{"v", "t"};
-    final int[] to = new int[]{R.id.tvVerseNumber, R.id.tvVerse};
+    final int[] to = new int[]{R.id.tvVerseNumber};//, R.id.tvVerse};
 
     public DevotionalFragment() {
         // Required empty public constructor
@@ -289,6 +289,7 @@ public class DevotionalFragment extends Fragment {
 //        System.out.println(spannableStringBuilderDevotionalText);
 //        tvDevotionalText.setMovementMethod(LinkMovementMethod.getInstance());
         getActivity().setTitle(R.string.devotional);
+        db.close();
         return view;
     }
 
@@ -363,7 +364,9 @@ public class DevotionalFragment extends Fragment {
     private long mBackPressed;
 
     private void doNotLookInMyCode(View view, String devotional[]) {
-        ((TextView) view.findViewById(R.id.tvDevotionalTitle)).setText(devotional[0]);
+        TextView devotionalTitle = (TextView) view.findViewById(R.id.tvDevotionalTitle);
+        devotionalTitle.setText(devotional[0]);
+        devotionalTitle.setVisibility(View.VISIBLE);
         receivedText = devotional[1];
 
 //        receivedText = "The Devotional Text for Today [John 15 vs 1-2]" +

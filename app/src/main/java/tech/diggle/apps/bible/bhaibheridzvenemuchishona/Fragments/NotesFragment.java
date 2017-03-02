@@ -63,7 +63,7 @@ public class NotesFragment extends Fragment {
                 BibleDataContract.Notes.TITLE,
                 BibleDataContract.Notes.NOTE};
 
-        final int[] to = new int[]{R.id.tvVerseNumber, R.id.tvVerse};
+        final int[] to = new int[]{R.id.tvVerseNumber};//}, R.id.tvVerse};
         final NotesCursorAdapter adapter = new NotesCursorAdapter(getContext(),
                 R.layout.list_item_note,
                 notes,

@@ -67,7 +67,7 @@ public class BibleDBHelper extends SQLiteAssetHelper {
         fts_table = sharedPref.getString("fts_key", "fts_t_english");
         Log.d("Initialising :" + bibleTextTable, "key: " + booksKeyTable);
 //        setForcedUpgrade(50);
-        SQLiteDatabase db = getWritableDatabase();
+//        SQLiteDatabase db = getWritableDatabase();
         if (needsUpgrade) {
             upgradeDB();
             createFtsTable();
@@ -474,11 +474,11 @@ public class BibleDBHelper extends SQLiteAssetHelper {
     //    Provide FTS4 on devices with API level greater than 11 only
 //    TODO: Add the search functionality to devices below the API. Probably never gonna happen ;)
     private void createFtsTable() {
-        SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("CREATE VIRTUAL TABLE fts_t_shona USING fts4 (content='t_shona', v)");
-        db.execSQL("INSERT INTO fts_t_shona(fts_t_shona) VALUES('rebuild')");
-        db.execSQL("CREATE VIRTUAL TABLE fts_t_english USING fts4 (content='t_bbe', v)");
-        db.execSQL("INSERT INTO fts_t_english(fts_t_english) VALUES('rebuild')");
+//        SQLiteDatabase db = getWritableDatabase();
+//        db.execSQL("CREATE VIRTUAL TABLE fts_t_shona USING fts4 (content='t_shona', v)");
+//        db.execSQL("INSERT INTO fts_t_shona(fts_t_shona) VALUES('rebuild')");
+//        db.execSQL("CREATE VIRTUAL TABLE fts_t_english USING fts4 (content='t_bbe', v)");
+//        db.execSQL("INSERT INTO fts_t_english(fts_t_english) VALUES('rebuild')");
     }
 
 //    public Cursor fullTextSearch(String search) {

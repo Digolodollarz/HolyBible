@@ -69,7 +69,7 @@ public class ShowChapterFragment extends DialogFragment {
 
     private class GetVerses extends AsyncTask<Void, Void, Cursor> {
         final String[] from = new String[]{"v", "t"};
-        final int[] to = new int[]{R.id.tvVerseNumber, R.id.tvVerse};
+        final int[] to = new int[]{R.id.tvVerseNumber};//, R.id.tvVerse};
 
         @Override
         protected Cursor doInBackground(Void... contexts) {
@@ -80,7 +80,7 @@ public class ShowChapterFragment extends DialogFragment {
         @Override
         protected void onPostExecute(Cursor verses) {
             ReadCursorAdapter adapter = new ReadCursorAdapter(getContext(),
-                    R.layout.read_view_verse,
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB?R.layout.read_view_verse:R.layout.list_item_book,
                     verses,
                     from,
                     to,

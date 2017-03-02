@@ -60,7 +60,7 @@ public class ReadFragment extends DialogFragment {
     String bookName;
     int chapter;
     final String[] from = new String[]{"v", "t"};
-    final int[] to = new int[]{R.id.tvVerseNumber, R.id.tvVerse};
+    final int[] to = new int[]{R.id.tvVerseNumber};//, R.id.tvVerse};
     private LinearLayout nav;
     //spinner spintoolbar//
     private Toolbar toolbar;
@@ -98,7 +98,7 @@ public class ReadFragment extends DialogFragment {
         //db.setBooksKeyTable(sharedPref.getString(getString(R.string.books_key), "key_english"));
         verses = db.getVerses(bookName, chapter);
         adapter = new ReadCursorAdapter(getContext(),
-                R.layout.read_view_verse,
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB?R.layout.read_view_verse:R.layout.list_item_book,
                 verses,
                 from,
                 to,
@@ -223,7 +223,7 @@ public class ReadFragment extends DialogFragment {
             listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
                 @Override
                 public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                    String verse = ((TextView) view.findViewById(R.id.tvVerseNumber)).getText().toString();//((TextView)view.findViewById(R.id.tvVerse)).getText().toString();
+                    String verse = ((TextView) view.findViewById(R.id.tvBook)).getText().toString();//((TextView)view.findViewById(R.id.tvVerse)).getText().toString();
 //                int verseNumber = Integer.parseInt(((TextView)view.findViewById(R.id.tvVerseNumber)).getText().toString());
                     String shareText = bookName + " " + chapter + " : " + verse;
 

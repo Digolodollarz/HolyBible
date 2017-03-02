@@ -2,6 +2,7 @@ package tech.diggle.apps.bible.bhaibheridzvenemuchishona.Helpers;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.os.Build;
 import android.support.v4.util.SparseArrayCompat;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.View;
@@ -25,7 +26,9 @@ public class ReadCursorAdapter extends SimpleCursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        TextView textView = (TextView) view.findViewById(R.id.tvVerseNumber);
+        TextView textView = Build.VERSION.SDK_INT>=Build.VERSION_CODES.HONEYCOMB?
+                (TextView) view.findViewById(R.id.tvVerseNumber):
+                (TextView) view.findViewById(R.id.tvBook);
         String text = "";
         for (String field : from) {
             if (text.isEmpty())
