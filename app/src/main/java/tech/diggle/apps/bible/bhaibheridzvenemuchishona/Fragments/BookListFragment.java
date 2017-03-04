@@ -1,7 +1,6 @@
 package tech.diggle.apps.bible.bhaibheridzvenemuchishona.Fragments;
 
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -17,7 +16,6 @@ import android.widget.TextView;
 
 import tech.diggle.apps.bible.bhaibheridzvenemuchishona.Helpers.BibleCursorAdapter;
 import tech.diggle.apps.bible.bhaibheridzvenemuchishona.Helpers.BibleDBHelper;
-import tech.diggle.apps.bible.bhaibheridzvenemuchishona.MainActivity;
 import tech.diggle.apps.bible.bhaibheridzvenemuchishona.R;
 
 /**
@@ -80,10 +78,10 @@ public class BookListFragment extends Fragment {
         db = new BibleDBHelper(getContext());
         Cursor cursorBooks;
         if (testament!=null&&!testament.isEmpty()) {
-            cursorBooks = db.getBooks(testament);
+            cursorBooks = db.getBooks();
         } else {
             testament = "New";
-            cursorBooks = db.getBooks(testament);
+            cursorBooks = db.getBooks();
         }
 
         listView = (ListView) view.findViewById(R.id.lvBookList);

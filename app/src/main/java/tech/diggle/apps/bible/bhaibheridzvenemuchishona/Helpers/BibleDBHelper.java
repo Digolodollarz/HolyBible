@@ -4,14 +4,19 @@ package tech.diggle.apps.bible.bhaibheridzvenemuchishona.Helpers;
  * Created by DiggleDollarz on 9/8/2016.
  */
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.CharArrayBuffer;
+import android.database.ContentObserver;
 import android.database.Cursor;
-import android.database.MatrixCursor;
+import android.database.DataSetObserver;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
+import android.net.Uri;
+import android.os.Bundle;
 import android.util.Log;
 
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
@@ -20,9 +25,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.zip.ZipInputStream;
 
 import tech.diggle.apps.bible.bhaibheridzvenemuchishona.R;
@@ -39,14 +41,14 @@ public class BibleDBHelper extends SQLiteAssetHelper {
     private static final String DATABASE_NAME = "bible-data.db";
     private static final int DATABASE_VERSION = 21;
     private boolean needsUpgrade = false;
-    private String bibleTextTable = "t_bbe";
-    private String booksKeyTable = "key_english";
+    private String bibleTextTable;// = "t_bbe";
+    private String booksKeyTable;// = "key_english";
     private String titleColumn = "title_en";
     private String devotionalColumn = "en";
     private String devotionalTable = "devotional";
     private String TEMP_DATABASE_NAME = "bible-data-new.db";
-    private static final String FTS_VIRTUAL_TABLE = "FTS";
-    private String fts_table;
+//    private static final String FTS_VIRTUAL_TABLE = "FTS";
+//    private String fts_table;
 
     public BibleDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -61,36 +63,35 @@ public class BibleDBHelper extends SQLiteAssetHelper {
         //super(context, DATABASE_NAME, context.getExternalFilesDir(null).getAbsolutePath(), null, DATABASE_VERSION);
         SharedPreferences sharedPref = context.getSharedPreferences("mysettings",
                 Context.MODE_PRIVATE);
-        booksKeyTable = sharedPref.getString(context.getString(R.string.books_key), "key_english");
-        bibleTextTable = sharedPref.getString(context.getString(R.string.language_key), "t_bbe");
+        booksKeyTable = sharedPref.getString(context.getString(R.string.books_key), "key_shona");
+        bibleTextTable = sharedPref.getString(context.getString(R.string.language_key), "t_shona");
 //        TODO: Initialise the FTS4 tables
-        fts_table = sharedPref.getString("fts_key", "fts_t_english");
+//        fts_table = sharedPref.getString("fts_key", "fts_t_english");
         Log.d("Initialising :" + bibleTextTable, "key: " + booksKeyTable);
 //        setForcedUpgrade(50);
 //        SQLiteDatabase db = getWritableDatabase();
         if (needsUpgrade) {
             upgradeDB();
-            createFtsTable();
+//            createFtsTable();
         }
-        if (sharedPref.getBoolean("databaseNotInitialised", true)) {
-            try {
-                createFtsTable();
-                sharedPref.edit().putBoolean("databaseNotInitialised", false).apply();
-            } catch (Exception e) {
-                Log.d("BibleDBHelper","Error Initialising database");
-                e.printStackTrace();
-            }
-        }
+//        if (sharedPref.getBoolean("databaseNotInitialised", true)) {
+//            try {
+//                createFtsTable();
+//                sharedPref.edit().putBoolean("databaseNotInitialised", false).apply();
+//            } catch (Exception e) {
+//                Log.d("BibleDBHelper","Error Initialising database");
+//                e.printStackTrace();
+//            }
+//        }
         mAssetPath = "databases" + "/" + DATABASE_NAME;
     }
 
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-//        super.onUpgrade(db, oldVersion, newVersion);
+//        Save the database as needing upgrade, then upgrade later.
         needsUpgrade = true;
-        Log.i("DiggleTechApps", "Database NOT YET Upgrading to newVersion");
-//        SQLiteDatabase dbTemp = SQLiteDatabase.openDatabase(path, null, SQLiteDatabase.OPEN_READWRITE);
+        Log.i("DiggleTechApps", "Database NOT YET Upgrading to new version");
     }
 
     private boolean upgradeDB() {
@@ -109,6 +110,8 @@ public class BibleDBHelper extends SQLiteAssetHelper {
         } catch (SQLiteAssetException e) {
             e.printStackTrace();
             return false;
+        } finally {
+            db.close();
         }
         return true;
     }
@@ -125,76 +128,75 @@ public class BibleDBHelper extends SQLiteAssetHelper {
     public Cursor getBooks() {
         SQLiteDatabase db = getReadableDatabase();
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
-        String[] sqlSelect = {"0 _id", "n"};
-        //String sqlTables = "key_english";
-        qb.setTables(booksKeyTable);
-        Cursor c = qb.query(db, sqlSelect, null, null,
-                null, null, null);
-        c.moveToFirst();
-        return c;
-    }
-
-    //done with this method yay
-    public Cursor getBooks(String testament) {
-        SQLiteDatabase db = getReadableDatabase();
-        SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
-        String[] sqlSelect = {"0 _id", "n"};
-        //String sqlTables = "key_english";
-        qb.setTables(booksKeyTable);
-        Cursor c = qb.query(db, sqlSelect, null, null,
-                null, null, null);
-        c.moveToFirst();
-        return c;
+        try {
+            String[] sqlSelect = {"0 _id", "n"};
+            //String sqlTables = "key_english";
+            qb.setTables(booksKeyTable);
+            Cursor c = qb.query(db, sqlSelect, null, null,
+                    null, null, null);
+            c.moveToFirst();
+            return c;
+        } catch (SQLiteAssetException e) {
+            Log.d("getBooks", "SQLiteAsset error");
+            e.printStackTrace();
+            return null;
+        } catch (Exception e) {
+            Log.d("getBooks", "Exception thrown");
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public Cursor getVerses(String bookName, int chapter) {
-        String localBook = getBookName(getBookId(bookName));
-        SQLiteDatabase db = getReadableDatabase();
-        SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
-        String[] sqlSelect = {"0 _id", "v", "t"};
-        String whereToGet = booksKeyTable + ".n = '" + localBook + "' AND " +
-                bibleTextTable + ".c = '" + chapter + "'";
-        Log.d("getVerses Text :" + bibleTextTable, "key: " + booksKeyTable);
-        qb.setTables(bibleTextTable + " INNER JOIN " + booksKeyTable + " ON " + bibleTextTable + ".b = " + booksKeyTable + ".b");
-        Cursor c = qb.query(db, sqlSelect, whereToGet, null,
-                null, null, null);
-        c.moveToFirst();
-        Log.d("THisIsALOG", "getVerses: " + c);
-        return c;
+        return getVersesByInt(getBookId(bookName), chapter);
     }
 
     public Cursor getVersesByInt(int book, int chapter) {
 
-
-//        String localBook = getBookName(getBookId(bookName));
-        SQLiteDatabase db = getReadableDatabase();
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
         String[] sqlSelect = {"0 _id", "v", "t"};
         String whereToGet = "b = '" + book + "' AND c = '" + chapter + "'";
-        Log.d("getVerses Text :" + bibleTextTable, "key: " + booksKeyTable);
-        qb.setTables(bibleTextTable);// + " INNER JOIN " + booksKeyTable + " ON " + bibleTextTable + ".b = " + booksKeyTable + ".b");
-        Cursor c = qb.query(db, sqlSelect, whereToGet, null,
-                null, null, null);
-        c.moveToFirst();
-        Log.d("THisIsALOG", "getVerses: " + c);
-        return c;
+        Log.d("getVerses Text: " + bibleTextTable, "key: " + booksKeyTable);
+        qb.setTables(bibleTextTable);
+
+        SQLiteDatabase db = getReadableDatabase();
+        try {
+            Cursor c = qb.query(db, sqlSelect, whereToGet, null,
+                    null, null, null);
+            Log.d("getVerses", c.moveToFirst() ? "Successfully Retrieved" : "Error Retrieving Verses");
+            return c;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            db.close();
+        }
+
     }
 
     public Cursor getChapters(String book) {
 //        TODO: Use book id
+        return (getChaptersByInt(getBookId(book)));
+    }
 
-        String localBook = getBookName(getBookId(book));
-        SQLiteDatabase db = getReadableDatabase();
+    public Cursor getChaptersByInt(int book) {
+//        TODO: Use book id
+
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
         qb.setDistinct(true);
         String[] sqlSelect = {"0 _id", "c", booksKeyTable + ".n"};
-        String whereToGet = booksKeyTable + ".n = '" + localBook + "'";
+        String whereToGet = bibleTextTable + ".b = '" + book + "'";// booksKeyTable + ".n = '" + localBook + "'";
         qb.setTables(bibleTextTable + " INNER JOIN " + booksKeyTable + " ON " + bibleTextTable + ".b = " + booksKeyTable + ".b");
-        Cursor c = qb.query(db, sqlSelect, whereToGet, null,
-                null, null, null);
-        c.moveToFirst();
-        Log.d("THisIsALOG", "getVerses: " + c);
-        return c;
+        SQLiteDatabase db = getReadableDatabase();
+        try {
+            Cursor c = qb.query(db, sqlSelect, whereToGet, null,
+                    null, null, null);
+            Log.d("getChapterByInt", c.moveToFirst() ? "Chapters loaded" : "Error loading chapters");
+            return c;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public Cursor searchVerses(String searchText) {
@@ -213,12 +215,16 @@ public class BibleDBHelper extends SQLiteAssetHelper {
 
         String whereToGet = "t LIKE '%" + searchText.trim() + "%'";
         qb.setTables(bibleTextTable + " INNER JOIN " + booksKeyTable + " ON " + bibleTextTable + ".b = " + booksKeyTable + ".b");
-        Cursor c =
-                qb.query(db, sqlSelect, whereToGet, null,
-                        null, null, null);
-//                db.rawQuery(" select 0 as _id, t from t_bbe where t like '%Holy%'", null);
-        c.moveToFirst();
-        return c;
+        try {
+            Cursor c =
+                    qb.query(db, sqlSelect, whereToGet, null,
+                            null, null, null);
+            c.moveToFirst();
+            return c;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public String[] getDevotional(int date) {
@@ -230,42 +236,256 @@ public class BibleDBHelper extends SQLiteAssetHelper {
 
         String whereToGet = "date = '" + (date) + "'";
         qb.setTables(devotionalTable);
-        Cursor c =
-                qb.query(db, sqlSelect, whereToGet, null,
-                        null, null, null, "1");
-//                db.rawQuery(" select 0 as _id, title_en, en from devotional where date = 341", null);
+        Cursor c = new Cursor() {
+            @Override
+            public int getCount() {
+                return 0;
+            }
 
-        if (c.moveToFirst()) {
-            devotional[0] = c.getString(c.getColumnIndex(titleColumn));
-            devotional[1] = c.getString(c.getColumnIndex(devotionalColumn));
-        } else {
-            devotional[0] = "Nothing for Today";
-            devotional[1] = "Nothing has been found in the database. " +
-                    "Please check the Play Store to get an updated version of the database" +
-                    "with a new devotional";
+            @Override
+            public int getPosition() {
+                return 0;
+            }
+
+            @Override
+            public boolean move(int i) {
+                return false;
+            }
+
+            @Override
+            public boolean moveToPosition(int i) {
+                return false;
+            }
+
+            @Override
+            public boolean moveToFirst() {
+                return false;
+            }
+
+            @Override
+            public boolean moveToLast() {
+                return false;
+            }
+
+            @Override
+            public boolean moveToNext() {
+                return false;
+            }
+
+            @Override
+            public boolean moveToPrevious() {
+                return false;
+            }
+
+            @Override
+            public boolean isFirst() {
+                return false;
+            }
+
+            @Override
+            public boolean isLast() {
+                return false;
+            }
+
+            @Override
+            public boolean isBeforeFirst() {
+                return false;
+            }
+
+            @Override
+            public boolean isAfterLast() {
+                return false;
+            }
+
+            @Override
+            public int getColumnIndex(String s) {
+                return 0;
+            }
+
+            @Override
+            public int getColumnIndexOrThrow(String s) throws IllegalArgumentException {
+                return 0;
+            }
+
+            @Override
+            public String getColumnName(int i) {
+                return null;
+            }
+
+            @Override
+            public String[] getColumnNames() {
+                return new String[0];
+            }
+
+            @Override
+            public int getColumnCount() {
+                return 0;
+            }
+
+            @Override
+            public byte[] getBlob(int i) {
+                return new byte[0];
+            }
+
+            @Override
+            public String getString(int i) {
+                return null;
+            }
+
+            @Override
+            public void copyStringToBuffer(int i, CharArrayBuffer charArrayBuffer) {
+
+            }
+
+            @Override
+            public short getShort(int i) {
+                return 0;
+            }
+
+            @Override
+            public int getInt(int i) {
+                return 0;
+            }
+
+            @Override
+            public long getLong(int i) {
+                return 0;
+            }
+
+            @Override
+            public float getFloat(int i) {
+                return 0;
+            }
+
+            @Override
+            public double getDouble(int i) {
+                return 0;
+            }
+
+            @Override
+            public int getType(int i) {
+                return 0;
+            }
+
+            @Override
+            public boolean isNull(int i) {
+                return false;
+            }
+
+            @Override
+            public void deactivate() {
+
+            }
+
+            @Override
+            public boolean requery() {
+                return false;
+            }
+
+            @Override
+            public void close() {
+
+            }
+
+            @Override
+            public boolean isClosed() {
+                return false;
+            }
+
+            @Override
+            public void registerContentObserver(ContentObserver contentObserver) {
+
+            }
+
+            @Override
+            public void unregisterContentObserver(ContentObserver contentObserver) {
+
+            }
+
+            @Override
+            public void registerDataSetObserver(DataSetObserver dataSetObserver) {
+
+            }
+
+            @Override
+            public void unregisterDataSetObserver(DataSetObserver dataSetObserver) {
+
+            }
+
+            @Override
+            public void setNotificationUri(ContentResolver contentResolver, Uri uri) {
+
+            }
+
+            @Override
+            public Uri getNotificationUri() {
+                return null;
+            }
+
+            @Override
+            public boolean getWantsAllOnMoveCalls() {
+                return false;
+            }
+
+            @Override
+            public void setExtras(Bundle bundle) {
+
+            }
+
+            @Override
+            public Bundle getExtras() {
+                return null;
+            }
+
+            @Override
+            public Bundle respond(Bundle bundle) {
+                return null;
+            }
+        };
+        try {
+            c = qb.query(db, sqlSelect, whereToGet, null,
+                    null, null, null, "1");
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (c.moveToFirst()) {
+                devotional[0] = c.getString(c.getColumnIndex(titleColumn));
+                devotional[1] = c.getString(c.getColumnIndex(devotionalColumn));
+            } else {
+                devotional[0] = "Nothing for Today";
+                devotional[1] = "Nothing has been found in the database. " +
+                        "Please check the Play Store to get an updated version of the database" +
+                        "with a new devotional";
+            }
         }
-//        c.close();
         return devotional;
     }
 
     public int getBookId(String bookName) {
-
-        Cursor c = getReadableDatabase().rawQuery("SELECT b from " +
-                booksKeyTable +
-                " WHERE n = '" + bookName + "'", null);
+        SQLiteDatabase db = getReadableDatabase();
         int rValue;
-        if (c.moveToFirst()) {
-            rValue = c.getInt(c.getColumnIndex("b"));
-        } else {
-            c = getReadableDatabase().rawQuery("SELECT b from " +
-                    "key_english" +
+        try {
+            Cursor c = db.rawQuery("SELECT b from " +
+                    booksKeyTable +
                     " WHERE n = '" + bookName + "'", null);
-            rValue = !c.moveToFirst() ?
-                    0 :
-                    c.getInt(c.getColumnIndex("b"));
+            if (c.moveToFirst()) {
+                rValue = c.getInt(c.getColumnIndex("b"));
+            } else {
+                c = getReadableDatabase().rawQuery("SELECT b from " +
+                        "key_english" +
+                        " WHERE n = '" + bookName + "'", null);
+                rValue = !c.moveToFirst() ?
+                        0 :
+                        c.getInt(c.getColumnIndex("b"));
+            }
+            c.close();
+            return rValue;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        } finally {
+            db.close();
         }
-        c.close();
-        return rValue;
 
     }
 
@@ -291,9 +511,6 @@ public class BibleDBHelper extends SQLiteAssetHelper {
 //        c.moveToFirst();
 // Gets the data repository in write mode
         SQLiteDatabase db = getWritableDatabase();
-        db.execSQL(BibleDataContract.Notes.CREATE_TABLE);
-
-
 // Create a new map of values, where column names are the keys
         ContentValues values = new ContentValues();
         values.put(BOOK, book);
@@ -304,7 +521,15 @@ public class BibleDBHelper extends SQLiteAssetHelper {
         values.put(TITLE, noteTitle);
 
 // Insert the new row, returning the primary key value of the new row
-        return db.insert(BibleDataContract.Notes.TABLE_NAME, null, values);
+        try {
+            db.execSQL(BibleDataContract.Notes.CREATE_TABLE);
+            return db.insert(BibleDataContract.Notes.TABLE_NAME, null, values);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
+        } finally {
+            db.close();
+        }
     }
 
     public Cursor getNotes() {
@@ -327,60 +552,12 @@ public class BibleDBHelper extends SQLiteAssetHelper {
         try {
             notes = qb.query(db, sqlSelect, null, null,
                     null, null, null, "50");
+            return notes;
         } catch (SQLException e) {
             e.printStackTrace();
             SQLiteDatabase dbReadable = getWritableDatabase();
             dbReadable.execSQL(BibleDataContract.Notes.CREATE_TABLE);
-        }
-
-
-        return notes;
-    }
-
-    public ArrayList<Cursor> getData(String Query) {
-        //get writable database
-        SQLiteDatabase sqlDB = this.getWritableDatabase();
-        String[] columns = new String[]{"mesage"};
-        //an array list of cursor to save two cursors one has results from the query
-        //other cursor stores error message if any errors are triggered
-        ArrayList<Cursor> alc = new ArrayList<>(2);
-        MatrixCursor Cursor2 = new MatrixCursor(columns);
-        alc.add(null);
-        alc.add(null);
-
-
-        try {
-            //execute the query results will be save in Cursor c
-            Cursor c = sqlDB.rawQuery(Query, null);
-
-
-            //add value to cursor2
-            Cursor2.addRow(new Object[]{"Success"});
-
-            alc.set(1, Cursor2);
-            if (null != c && c.getCount() > 0) {
-
-
-                alc.set(0, c);
-                c.moveToFirst();
-
-                return alc;
-            }
-            return alc;
-        } catch (SQLException sqlEx) {
-            Log.d("printing exception", sqlEx.getMessage());
-            //if any exceptions are triggered save the error message to cursor an return the arraylist
-            Cursor2.addRow(new Object[]{"" + sqlEx.getMessage()});
-            alc.set(1, Cursor2);
-            return alc;
-        } catch (Exception ex) {
-
-            Log.d("printing exception", ex.getMessage());
-
-            //if any exceptions are triggered save the error message to cursor an return the arraylist
-            Cursor2.addRow(new Object[]{"" + ex.getMessage()});
-            alc.set(1, Cursor2);
-            return alc;
+            return null;
         }
 
 
@@ -400,14 +577,9 @@ public class BibleDBHelper extends SQLiteAssetHelper {
 
     public boolean deleteNoteById(long noteId) {
         try {
-//            return getReadableDatabase().rawQuery("DELETE FROM " +
-//                    BibleDataContract.Notes.TABLE_NAME +
-//                    " WHERE _id = " + noteId, null)>0;
             return getWritableDatabase().delete(BibleDataContract.Notes.TABLE_NAME,
                     "_id = " + noteId,
                     null) > 0;
-
-
         } catch (SQLException ex) {
             ex.printStackTrace();
             return false;

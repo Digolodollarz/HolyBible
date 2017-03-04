@@ -15,8 +15,8 @@ android {
         applicationId "tech.diggle.apps.bible.bhaibheridzvenemuchishona"
         minSdkVersion 9
         targetSdkVersion 25
-        versionCode 17
-        versionName "0.9.5"
+        versionCode 18
+        versionName "0.9.6"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         versionNameSuffix ''
     }

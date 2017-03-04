@@ -6,7 +6,7 @@ import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.View;
 
 /**
- * Created by DiggeDollarz on 4/12/2016.
+ * Created by DiggleDollarz on 4/12/2016.
  */
 
 public class BibleCursorAdapter extends SimpleCursorAdapter {
