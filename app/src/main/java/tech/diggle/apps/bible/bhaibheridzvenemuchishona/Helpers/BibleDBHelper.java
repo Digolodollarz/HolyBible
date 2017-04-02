@@ -39,7 +39,7 @@ import static tech.diggle.apps.bible.bhaibheridzvenemuchishona.Helpers.BibleData
 public class BibleDBHelper extends SQLiteAssetHelper {
 
     private static final String DATABASE_NAME = "bible-data.db";
-    private static final int DATABASE_VERSION = 21;
+    private static final int DATABASE_VERSION = 31;
     private boolean needsUpgrade = false;
     private String bibleTextTable;// = "t_bbe";
     private String booksKeyTable;// = "key_english";
@@ -68,6 +68,7 @@ public class BibleDBHelper extends SQLiteAssetHelper {
 //        TODO: Initialise the FTS4 tables
 //        fts_table = sharedPref.getString("fts_key", "fts_t_english");
         Log.d("Initialising :" + bibleTextTable, "key: " + booksKeyTable);
+        SQLiteDatabase db = getWritableDatabase();
 //        setForcedUpgrade(50);
 //        SQLiteDatabase db = getWritableDatabase();
         if (needsUpgrade) {
@@ -83,7 +84,7 @@ public class BibleDBHelper extends SQLiteAssetHelper {
 //                e.printStackTrace();
 //            }
 //        }
-        mAssetPath = "databases" + "/" + DATABASE_NAME;
+//        mAssetPath = "databases" + "/" + DATABASE_NAME;
     }
 
 
@@ -104,8 +105,11 @@ public class BibleDBHelper extends SQLiteAssetHelper {
 //            db.endTransaction();
             db.execSQL("ATTACH '" + path + "' AS TEMPo");
 //            db.beginTransaction();
+            db.delete("devotional", null, null);
             db.execSQL("INSERT or REPLACE INTO devotional SELECT * FROM TEMPo.devotional");
+            db.delete("t_bbe", null, null);
             db.execSQL("INSERT OR REPLACE INTO t_bbe SELECT * FROM TEMPo.t_bbe");
+            db.delete("t_shona", null, null);
             db.execSQL("INSERT OR REPLACE INTO t_shona SELECT * FROM TEMPo.t_shona");
         } catch (SQLiteAssetException e) {
             e.printStackTrace();
@@ -588,30 +592,30 @@ public class BibleDBHelper extends SQLiteAssetHelper {
 
     private static final String TAG = SQLiteAssetHelper.class.getSimpleName();
     private final Context mContext;
-    private String mAssetPath;
+    private String mAssetPath1;
 
     private void copyDatabaseFromAssets() throws SQLiteAssetException {
         Log.w(TAG, "copying database from assets...");
         String mDatabasePath = mContext.getApplicationInfo().dataDir + "/databases";
-        String path = mAssetPath;
+        String sourcePath = "databases" + "/" + DATABASE_NAME;
         String dest = mDatabasePath + "/" + TEMP_DATABASE_NAME;
         InputStream is;
         boolean isZip = false;
 
         try {
             // try uncompressed
-            is = mContext.getAssets().open(path);
+            is = mContext.getAssets().open(sourcePath);
         } catch (IOException e) {
             // try zip
             try {
-                is = mContext.getAssets().open(path + ".zip");
+                is = mContext.getAssets().open(sourcePath + ".zip");
                 isZip = true;
             } catch (IOException e2) {
                 // try gzip
                 try {
-                    is = mContext.getAssets().open(path + ".gz");
+                    is = mContext.getAssets().open(sourcePath + ".gz");
                 } catch (IOException e3) {
-                    SQLiteAssetException se = new SQLiteAssetException("Missing " + mAssetPath + " file (or .zip, .gz archive) in assets, or target folder not writable");
+                    SQLiteAssetException se = new SQLiteAssetException("Missing " + sourcePath + " file (or .zip, .gz archive) in assets, or target folder not writable");
                     se.setStackTrace(e3.getStackTrace());
                     throw se;
                 }
