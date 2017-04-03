@@ -87,7 +87,7 @@ public class DevotionalFragment extends Fragment {
         db = new BibleDBHelper(getContext());
         String[] devotional = db.getDevotional(dayOfYear);
 
-        doNotLookInMyCode(view, devotional);
+        displayFragment(view, devotional);
 
         Button yesterdayDevotional = (Button) view.findViewById(R.id.btnReadYesterday);
         yesterdayDevotional.setOnClickListener(new View.OnClickListener() {
@@ -100,7 +100,7 @@ public class DevotionalFragment extends Fragment {
 //                    dayOfYear = calendar.getActualMaximum(Calendar.DAY_OF_YEAR);
 
                 calendar.add(Calendar.DATE, -1);
-                doNotLookInMyCode(view, db.getDevotional(calendar.get(Calendar.DAY_OF_YEAR)));
+                displayFragment(view, db.getDevotional(calendar.get(Calendar.DAY_OF_YEAR)));
             }
         });
 
@@ -115,7 +115,7 @@ public class DevotionalFragment extends Fragment {
 //                    dayOfYear = calendar.getActualMaximum(Calendar.DAY_OF_YEAR);
 
                 calendar.add(Calendar.DATE, 1);
-                doNotLookInMyCode(view, db.getDevotional(calendar.get(Calendar.DAY_OF_YEAR)));
+                displayFragment(view, db.getDevotional(calendar.get(Calendar.DAY_OF_YEAR)));
             }
         });
 //        ((TextView) view.findViewById(R.id.tvDevotionalTitle)).setText(devotional[0]);
@@ -363,6 +363,65 @@ public class DevotionalFragment extends Fragment {
     private static final int TIME_INTERVAL = 2000;
     private long mBackPressed;
 
+    private void displayFragment(View view, String devotional[]) {
+        TextView devotionalTitle = (TextView) view.findViewById(R.id.tvDevotionalTitle);
+        devotionalTitle.setText(devotional[0]);
+        devotionalTitle.setVisibility(View.VISIBLE);
+
+        receivedText = devotional[1];
+        Pattern pattern = Pattern.compile("(\\b\\d?(?= )* *[A-Za-z]{2,})(?: +)(\\d+)(?::)(\\d+)");
+        Matcher matcher = pattern.matcher(receivedText);
+
+        if (matcher.find()) {
+            final String bookName = matcher.group(1);
+
+            final int chapter = Integer.parseInt(matcher.group(2));
+            final int startVerse = Integer.parseInt(matcher.group(3));
+            final int book = db.getBookId(bookName);
+            Button readVerse = (Button) view.findViewById(R.id.btnReadSource);
+            readVerse.setText(devotional[1]);
+            readVerse.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    DialogFragment newFragment = ShowChapterFragment.newInstance();
+                    Bundle args = new Bundle();
+                    args.putInt(BibleDataContract.CHAPTER, chapter);
+                    args.putInt("START_VERSE", startVerse);
+                    args.putInt(BibleDataContract.BOOK, book);
+                    args.putString("BOOK_NAME", bookName);
+                    args.putInt("LAST_VERSE", 0);
+                    newFragment.setArguments(args);
+                    newFragment.show(getActivity().getSupportFragmentManager(), "dialog");
+
+                }
+            });
+            readVerse.setVisibility(View.VISIBLE);
+        }
+
+        Button readVerse = (Button) view.findViewById(R.id.btnReadSource);
+        readVerse.setText(devotional[1]);
+        readVerse.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DialogFragment newFragment = ShowChapterFragment.newInstance();
+                Bundle args = new Bundle();
+                args.putInt(BibleDataContract.CHAPTER, chapter);
+                args.putInt("START_VERSE", startVerse);
+                args.putInt(BibleDataContract.BOOK, book);
+                args.putString("BOOK_NAME", bookName);
+                args.putInt("LAST_VERSE", 0);
+                newFragment.setArguments(args);
+                newFragment.show(getActivity().getSupportFragmentManager(), "dialog");
+
+            }
+        });
+        readVerse.setVisibility(View.VISIBLE);
+
+        TextView tvDevotionalText = (TextView) view.findViewById(R.id.tvDevotionalText);
+        tvDevotionalText.setText(devotional[2]);
+        tvDevotionalText.setVisibility(View.VISIBLE);
+    }
+
     private void doNotLookInMyCode(View view, String devotional[]) {
         TextView devotionalTitle = (TextView) view.findViewById(R.id.tvDevotionalTitle);
         devotionalTitle.setText(devotional[0]);
@@ -469,7 +528,7 @@ public class DevotionalFragment extends Fragment {
                         final int startVerse = clickDetails.startVerse;
 
                         Button readVerse = (Button) view.findViewById(R.id.btnReadSource);
-                        readVerse.setText("Read " +bookName + " " + chapter + " : " + startVerse);
+                        readVerse.setText("Read " + bookName + " " + chapter + " : " + startVerse);
                         readVerse.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {

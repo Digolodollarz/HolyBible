@@ -43,8 +43,9 @@ public class BibleDBHelper extends SQLiteAssetHelper {
     private boolean needsUpgrade = false;
     private String bibleTextTable;// = "t_bbe";
     private String booksKeyTable;// = "key_english";
-    private String titleColumn = "title_en";
-    private String devotionalColumn = "en";
+    private String titleColumn = "header";
+    private String devotionalColumn = "text";
+    private String verseColumn = "verse";
     private String devotionalTable = "devotional";
     private String TEMP_DATABASE_NAME = "bible-data-new.db";
 //    private static final String FTS_VIRTUAL_TABLE = "FTS";
@@ -232,10 +233,10 @@ public class BibleDBHelper extends SQLiteAssetHelper {
     }
 
     public String[] getDevotional(int date) {
-        String[] devotional = new String[2];
+        String[] devotional = new String[3];
         SQLiteDatabase db = getReadableDatabase();
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
-        String[] sqlSelect = {"0 _id", titleColumn, devotionalColumn};
+        String[] sqlSelect = {"0 _id", titleColumn, verseColumn, devotionalColumn};
         String orderBy = "date";
 
         String whereToGet = "date = '" + (date) + "'";
@@ -454,7 +455,8 @@ public class BibleDBHelper extends SQLiteAssetHelper {
         } finally {
             if (c.moveToFirst()) {
                 devotional[0] = c.getString(c.getColumnIndex(titleColumn));
-                devotional[1] = c.getString(c.getColumnIndex(devotionalColumn));
+                devotional[1] = c.getString(c.getColumnIndex(verseColumn));
+                devotional[2] = c.getString(c.getColumnIndex(devotionalColumn));
             } else {
                 devotional[0] = "Nothing for Today";
                 devotional[1] = "Nothing has been found in the database. " +
