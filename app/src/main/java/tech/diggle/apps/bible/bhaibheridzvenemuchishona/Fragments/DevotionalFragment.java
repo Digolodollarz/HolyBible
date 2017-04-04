@@ -398,25 +398,6 @@ public class DevotionalFragment extends Fragment {
             readVerse.setVisibility(View.VISIBLE);
         }
 
-        Button readVerse = (Button) view.findViewById(R.id.btnReadSource);
-        readVerse.setText(devotional[1]);
-        readVerse.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                DialogFragment newFragment = ShowChapterFragment.newInstance();
-                Bundle args = new Bundle();
-                args.putInt(BibleDataContract.CHAPTER, chapter);
-                args.putInt("START_VERSE", startVerse);
-                args.putInt(BibleDataContract.BOOK, book);
-                args.putString("BOOK_NAME", bookName);
-                args.putInt("LAST_VERSE", 0);
-                newFragment.setArguments(args);
-                newFragment.show(getActivity().getSupportFragmentManager(), "dialog");
-
-            }
-        });
-        readVerse.setVisibility(View.VISIBLE);
-
         TextView tvDevotionalText = (TextView) view.findViewById(R.id.tvDevotionalText);
         tvDevotionalText.setText(devotional[2]);
         tvDevotionalText.setVisibility(View.VISIBLE);
