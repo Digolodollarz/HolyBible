@@ -21,6 +21,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -44,6 +45,7 @@ public class MainActivity extends AppCompatActivity
         ChapterListFragment.OnFragmentInteractionListener {
 
     private Context context;
+    private String TAG = "mainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,10 +99,15 @@ public class MainActivity extends AppCompatActivity
 //            }
 //        }
         //</editor-fold>
+//        android.intent.action.VIEW
 
-        Bundle args = getIntent().getExtras();
-
-        if (args != null) {
+        Intent intent = getIntent();
+        Bundle args = intent.getExtras();
+        if (intent.getAction().equals("android.intent.action.VIEW")) {
+            Uri data = intent.getData();
+            Toast.makeText(this, data.toString(), Toast.LENGTH_LONG).show();
+            Log.d(TAG, "onCreate: " + data);
+        } else if (args != null) {
             Fragment fragment;
             int openFragmentId = args.getInt("FRAGMENT", -1);
             if (openFragmentId == 0xA) {
@@ -148,7 +155,7 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         Menu drawerMenu = navigationView.getMenu();
         MenuItem navTheme = drawerMenu.findItem(R.id.nav_theme);
-        navTheme.setTitle(Singleton.getInstance().getDarkMode()?"Light Theme":"Dark Theme");
+        navTheme.setTitle(Singleton.getInstance().getDarkMode() ? "Light Theme" : "Dark Theme");
         navigationView.setNavigationItemSelectedListener(this);
     }
 

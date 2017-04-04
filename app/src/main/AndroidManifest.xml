@@ -21,6 +21,32 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <intent-filter
+                android:autoVerify="true"
+                android:label="read_bible">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <!-- Accepts URIs that begin with "http://www.diggle.tech” -->
+                <data android:scheme="http"
+                    android:host="www.diggle.tech"
+                    android:pathPrefix="/bible" />
+                <data android:scheme="https"
+                    android:host="www.diggle.tech"
+                    android:pathPrefix="/bible" />
+                <data android:scheme="http"
+                    android:host="diggle.tech"
+                    android:pathPrefix="/bible" />
+                <data android:scheme="https"
+                    android:host="diggle.tech"
+                    android:pathPrefix="/bible" />
+                <!-- note that the leading "/" is required for pathPrefix-->
+                <!-- Accepts URIs that begin with "example://gizmos” -->
+                <!--<data android:scheme="example"-->
+                    <!--android:host="gizmos" />-->
+
+            </intent-filter>
         </activity>
         <activity android:name=".ShareActivity" />
         <activity android:name=".SearchActivity">
