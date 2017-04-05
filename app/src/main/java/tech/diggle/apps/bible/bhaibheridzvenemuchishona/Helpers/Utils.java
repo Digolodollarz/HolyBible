@@ -15,6 +15,8 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -69,6 +71,20 @@ public class Utils {
 
     public static String convertStreamToString(InputStream is) {
         return new Scanner(is).useDelimiter("\\A").next();
+    }
+
+    public static String sanitiseBookName(String bookName){
+        Pattern pattern = Pattern.compile("^[a-zA-Z]");
+        Pattern pattern1 = Pattern.compile("^\\d[a-zA-Z]+");
+        Matcher matcher = pattern.matcher(bookName);
+        Matcher matcher1 = pattern1.matcher(bookName);
+        if(matcher.find()){
+            return bookName.substring(0, 1).toUpperCase() + bookName.substring(1).toLowerCase();
+        }else if(matcher1.find()){
+            Log.d(TAG, "sanitiseBookName: " + bookName.substring(0, 1)+ " " + bookName.substring(1, 2).toUpperCase() + bookName.substring(2).toLowerCase());
+            return bookName.substring(0, 1)+ " " + bookName.substring(1, 2).toUpperCase() + bookName.substring(2).toLowerCase();
+        }
+        return null;
     }
 
 }

@@ -14,6 +14,7 @@ import android.database.Cursor;
 import android.database.DataSetObserver;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.os.Bundle;
@@ -39,7 +40,7 @@ import static tech.diggle.apps.bible.bhaibheridzvenemuchishona.Helpers.BibleData
 public class BibleDBHelper extends SQLiteAssetHelper {
 
     private static final String DATABASE_NAME = "bible-data.db";
-    private static final int DATABASE_VERSION = 31;
+    private static final int DATABASE_VERSION = 33;
     private boolean needsUpgrade = false;
     private String bibleTextTable;// = "t_bbe";
     private String booksKeyTable;// = "key_english";
@@ -106,13 +107,14 @@ public class BibleDBHelper extends SQLiteAssetHelper {
 //            db.endTransaction();
             db.execSQL("ATTACH '" + path + "' AS TEMPo");
 //            db.beginTransaction();
-            db.delete("devotional", null, null);
-            db.execSQL("INSERT or REPLACE INTO devotional SELECT * FROM TEMPo.devotional");
+            db.execSQL("DROP TABLE IF EXISTS devotional");
+            db.execSQL("CREATE TABLE devotional AS SELECT * FROM TEMPo.devotional");
+//            db.execSQL("INSERT or REPLACE INTO devotional SELECT * FROM TEMPo.devotional");
             db.delete("t_bbe", null, null);
             db.execSQL("INSERT OR REPLACE INTO t_bbe SELECT * FROM TEMPo.t_bbe");
             db.delete("t_shona", null, null);
             db.execSQL("INSERT OR REPLACE INTO t_shona SELECT * FROM TEMPo.t_shona");
-        } catch (SQLiteAssetException e) {
+        } catch (SQLiteException e) {
             e.printStackTrace();
             return false;
         } finally {
@@ -239,7 +241,7 @@ public class BibleDBHelper extends SQLiteAssetHelper {
         String[] sqlSelect = {"0 _id", titleColumn, verseColumn, devotionalColumn};
         String orderBy = "date";
 
-        String whereToGet = "date = '" + (date) + "'";
+        String whereToGet = "_id = '17" + (date) + "'";
         qb.setTables(devotionalTable);
         Cursor c = new Cursor() {
             @Override

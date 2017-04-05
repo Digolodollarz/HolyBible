@@ -26,7 +26,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 import tech.diggle.apps.bible.bhaibheridzvenemuchishona.Fragments.BookListFragment;
@@ -36,6 +36,7 @@ import tech.diggle.apps.bible.bhaibheridzvenemuchishona.Fragments.HymnsFragment;
 import tech.diggle.apps.bible.bhaibheridzvenemuchishona.Fragments.NotesFragment;
 import tech.diggle.apps.bible.bhaibheridzvenemuchishona.Fragments.ReadFragment;
 import tech.diggle.apps.bible.bhaibheridzvenemuchishona.Helpers.Singleton;
+import tech.diggle.apps.bible.bhaibheridzvenemuchishona.Helpers.Utils;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -100,13 +101,81 @@ public class MainActivity extends AppCompatActivity
 //        }
         //</editor-fold>
 //        android.intent.action.VIEW
-
+// ATTENTION: This was auto-generated to handle app links.
+//        Intent appLinkIntent = getIntent();
+//        String appLinkAction = appLinkIntent.getAction();
+//        Uri appLinkData = appLinkIntent.getData();
         Intent intent = getIntent();
-        Bundle args = intent.getExtras();
-        if (intent.getAction().equals("android.intent.action.VIEW")) {
-            Uri data = intent.getData();
-            Toast.makeText(this, data.toString(), Toast.LENGTH_LONG).show();
-            Log.d(TAG, "onCreate: " + data);
+        Bundle args = intent.getExtras()!=null?intent.getExtras():new Bundle();
+        if (intent.getAction() != null && intent.getAction().equals("android.intent.action.VIEW")) {
+            Uri uri = intent.getData();
+            Toast.makeText(this, uri.toString(), Toast.LENGTH_LONG).show();
+            Log.d(TAG, "onCreate: " + uri);
+
+//            String protocol = uri.getScheme();
+//            String server = uri.getAuthority();
+//            String path = uri.getPath();
+            String host = uri.getHost();
+            List<String> paths = uri.getPathSegments();
+//            Set<String> urlArgs = uri.getQueryParameterNames();
+            String language = uri.getQueryParameter("lang");
+//            TODO: Check john 4 vs 4
+            try {
+                String book = null;
+                int verse = 0;
+                int chapter = 0;
+                Log.d(TAG, "onCreate: " + paths);
+
+                if (host.equals("diggle.tech")||host.equals("www.diggle.tech")) {
+                    if (paths.size() >= 2) book = Utils.sanitiseBookName(paths.get(1));
+                    if (paths.size() >= 3) try {
+                        chapter = Integer.parseInt(paths.get(2));
+                    } catch (NumberFormatException e) {
+                        Log.d(TAG, "onCreate: invalid chapter number" + paths.get(2),e);
+                    }
+                    if (paths.size() >= 4) try {
+                        verse = Integer.parseInt(paths.get(3));
+                    } catch (NumberFormatException e) {
+                        Log.d(TAG, "onCreate: invalid chapter number" + paths.get(3),e);
+                    }
+//                    verse = paths.get(3);
+                    args.putString("BOOK", book);
+                    args.putInt("CHAPTER", chapter);
+                    args.putInt("VERSE", verse);
+
+                    Fragment fragment = new ReadFragment();
+                    fragment.setArguments(args);
+                    // Add the fragment to the 'fragment_container' FrameLayout
+                    getSupportFragmentManager().beginTransaction()
+                            .add(R.id.content_frame, fragment).commit();
+                }else if (host.equals("bible.diggle.tech")) {
+                    if (paths.size() >= 1) book = Utils.sanitiseBookName(paths.get(0));
+                    if (paths.size() >= 2) try {
+                        chapter = Integer.parseInt(paths.get(1));
+                    } catch (NumberFormatException e) {
+                        Log.d(TAG, "onCreate: invalid chapter number" + paths.get(1),e);
+                    }
+                    if (paths.size() >= 3) try {
+                        verse = Integer.parseInt(paths.get(2));
+                    } catch (NumberFormatException e) {
+                        Log.d(TAG, "onCreate: invalid chapter number" + paths.get(2),e);
+                    }
+//                    verse = paths.get(3);
+                    args.putString("BOOK", book);
+                    args.putInt("CHAPTER", chapter);
+                    args.putInt("VERSE", verse);
+
+                    Fragment fragment = new ReadFragment();
+                    fragment.setArguments(args);
+                    // Add the fragment to the 'fragment_container' FrameLayout
+                    getSupportFragmentManager().beginTransaction()
+                            .add(R.id.content_frame, fragment).commit();
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+
+
         } else if (args != null) {
             Fragment fragment;
             int openFragmentId = args.getInt("FRAGMENT", -1);
@@ -157,6 +226,7 @@ public class MainActivity extends AppCompatActivity
         MenuItem navTheme = drawerMenu.findItem(R.id.nav_theme);
         navTheme.setTitle(Singleton.getInstance().getDarkMode() ? "Light Theme" : "Dark Theme");
         navigationView.setNavigationItemSelectedListener(this);
+
     }
 
     @Override

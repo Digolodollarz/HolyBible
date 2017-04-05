@@ -14,6 +14,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -80,6 +81,8 @@ public class ReadFragment extends DialogFragment {
             bookName = args.getString("BOOK");
             chapter = args.getInt("CHAPTER");
             startVerse = args.getInt("VERSE");
+            Log.d("TAG", "onCreateView: " + args.toString());
+
         } else {
             try {
                 this.finalize();

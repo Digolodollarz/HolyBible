@@ -1,29 +1,18 @@
 package tech.diggle.apps.bible.bhaibheridzvenemuchishona.Fragments;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
-import android.text.Spannable;
-import android.text.SpannableStringBuilder;
-import android.text.method.LinkMovementMethod;
-import android.text.style.ClickableSpan;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.Calendar;
 import java.util.regex.Matcher;
@@ -31,7 +20,6 @@ import java.util.regex.Pattern;
 
 import tech.diggle.apps.bible.bhaibheridzvenemuchishona.Helpers.BibleDBHelper;
 import tech.diggle.apps.bible.bhaibheridzvenemuchishona.Helpers.BibleDataContract;
-import tech.diggle.apps.bible.bhaibheridzvenemuchishona.Helpers.ReadCursorAdapter;
 import tech.diggle.apps.bible.bhaibheridzvenemuchishona.R;
 
 import static android.view.View.GONE;
@@ -369,7 +357,7 @@ public class DevotionalFragment extends Fragment {
         devotionalTitle.setVisibility(View.VISIBLE);
 
         receivedText = devotional[1];
-        Pattern pattern = Pattern.compile("(\\b\\d?(?= )* *[A-Za-z]{2,})(?: +)(\\d+)(?::)(\\d+)");
+        Pattern pattern = Pattern.compile("(\\b\\d? ?[A-Za-z]{2,})(?: +)(\\d+)(?::)(\\d+)");
         Matcher matcher = pattern.matcher(receivedText);
 
         if (matcher.find()) {
@@ -399,316 +387,316 @@ public class DevotionalFragment extends Fragment {
         }
 
         TextView tvDevotionalText = (TextView) view.findViewById(R.id.tvDevotionalText);
-        tvDevotionalText.setText(devotional[2]);
+        tvDevotionalText.setText(devotional[2].replace("\n\n*","").replace("<P>",""));
         tvDevotionalText.setVisibility(View.VISIBLE);
     }
 
-    private void doNotLookInMyCode(View view, String devotional[]) {
-        TextView devotionalTitle = (TextView) view.findViewById(R.id.tvDevotionalTitle);
-        devotionalTitle.setText(devotional[0]);
-        devotionalTitle.setVisibility(View.VISIBLE);
-        receivedText = devotional[1];
-
-//        receivedText = "The Devotional Text for Today [John 15 vs 1-2]" +
-//                "I am the true vine, and my father is the vine dresser [John 15vs 2]" +
-//                "For God so loved this wicked world, that He giveth His only begotten Son," +
-//                " that whosoever believeth in him shall not perish, but have and everlasting life ([John 3 vs 16]).";
-
-        SpannableStringBuilder spannableStringBuilderDevotionalText;
-        StringBuilder sbDevotionalText = new StringBuilder(receivedText);
-        spannableStringBuilderDevotionalText = new SpannableStringBuilder();
-
-        Pattern pattern = Pattern.compile("\\[\\w+\\s\\d+\\s\\w{2}\\s\\d+]");
-        Pattern pattern1 = Pattern.compile("\\[[^\\d\\W]+\\s\\d+\\s\\w{2}\\s\\d+]");
-        Pattern pattern2 = Pattern.compile("\\[\\d\\w+\\s\\d+\\s\\w{2}\\s\\d+]");
-
-//        sbDevotionalText = new StringBuilder("Today's Daily verse is from [John 3 vs 10]. Read and enjoy!" +
-//                "and yesterday's was from " +
-//                "[1John 3 vs 10]. Read and enjoy!" + "Today's Daily verse is from [John 3 vs 10]. Read and enjoy!" +
-//                "and yesterday's was from " +
-//                "[1John 3 vs 10]. Read and enjoy!");
-        Matcher matcherAnyVerse = pattern.matcher(sbDevotionalText);
-        Matcher matcherAnyVerse1 = pattern.matcher(sbDevotionalText);
-        Matcher matcherNoNumber = pattern1.matcher(sbDevotionalText);
-        Matcher matcherNumber = pattern2.matcher(sbDevotionalText);
-        if (matcherAnyVerse1.replaceAll("").replaceAll("((?=[^a-z])([^A-Z]))*", "").isEmpty()) {
-
-            if (matcherAnyVerse.find()) {
-                do {
-                    ClickDetails clickDetails = new ClickDetails();
-                    try {
-                        int mnnStart, mnStart;
-                        boolean num = matcherNumber.find();
-                        boolean noNum = matcherNoNumber.find();
-
-                        if (noNum)
-                            mnnStart = matcherNoNumber.start();
-                        else
-                            mnnStart = 0;
-
-                        if (num)
-                            mnStart = matcherNumber.start();
-                        else
-                            mnStart = 0;
-
-                        if (num && noNum) {
-                            if (mnnStart > mnStart) {
-                                clickDetails.displayText = sbDevotionalText.substring(sbDevotionalText.indexOf("[") + 1, sbDevotionalText.indexOf("[") + 2)
-                                        + " "
-                                        + sbDevotionalText.substring(sbDevotionalText.indexOf("[") + 2, sbDevotionalText.indexOf("]", sbDevotionalText.indexOf("[") + 2));
-                                spannableStringBuilderDevotionalText.append(sbDevotionalText.substring(0, sbDevotionalText.indexOf("[", matcherNumber.start())));
-                                sbDevotionalText.delete(0, sbDevotionalText.indexOf("[", matcherNumber.start()) + 1);
-                                clickDetails.bookName = sbDevotionalText.substring(0, 1) + " " + sbDevotionalText.substring(1, sbDevotionalText.indexOf(" "));
-                                sbDevotionalText.delete(0, sbDevotionalText.indexOf(" ") + 1);
-                                clickDetails.chapter = Integer
-                                        .parseInt(sbDevotionalText.substring(0, sbDevotionalText.indexOf(" ")));
-                                sbDevotionalText.delete(0, sbDevotionalText.indexOf("vs ") + 3);
-                                clickDetails.startVerse = Integer.parseInt(sbDevotionalText.substring(0, sbDevotionalText.indexOf("]")));
-                                sbDevotionalText.delete(0, sbDevotionalText.indexOf("]") + 1);
-                            } else {
-                                clickDetails.displayText = sbDevotionalText.substring(sbDevotionalText.indexOf("[") + 1, sbDevotionalText.indexOf("]"));
-                                spannableStringBuilderDevotionalText.append(sbDevotionalText.substring(0, sbDevotionalText.indexOf("[", matcherNoNumber.start())));
-                                sbDevotionalText.delete(0, sbDevotionalText.indexOf("[", matcherNoNumber.start()) + 1);
-                                clickDetails.bookName = sbDevotionalText.substring(0, 1) + sbDevotionalText.substring(1, sbDevotionalText.indexOf(" "));
-                                sbDevotionalText.delete(0, sbDevotionalText.indexOf(" ") + 1);
-                                clickDetails.chapter = Integer
-                                        .parseInt(sbDevotionalText.substring(0, sbDevotionalText.indexOf(" ")));
-                                sbDevotionalText.delete(0, sbDevotionalText.indexOf("vs ") + 3);
-                                clickDetails.startVerse = Integer.parseInt(sbDevotionalText.substring(0, sbDevotionalText.indexOf("]")));
-                                sbDevotionalText.delete(0, sbDevotionalText.indexOf("]") + 1);
-                            }
-                        } else if (!noNum && num) {
-                            clickDetails.displayText = sbDevotionalText.substring(sbDevotionalText.indexOf("[") + 1, sbDevotionalText.indexOf("[") + 2)
-                                    + " "
-                                    + sbDevotionalText.substring(sbDevotionalText.indexOf("[") + 2, sbDevotionalText.indexOf("]", sbDevotionalText.indexOf("[") + 2));
-                            spannableStringBuilderDevotionalText.append(sbDevotionalText.substring(0, sbDevotionalText.indexOf("[", matcherNumber.start())));
-                            sbDevotionalText.delete(0, sbDevotionalText.indexOf("[", matcherNumber.start()) + 1);
-                            clickDetails.bookName = sbDevotionalText.substring(0, 1) + " " + sbDevotionalText.substring(1, sbDevotionalText.indexOf(" "));
-                            sbDevotionalText.delete(0, sbDevotionalText.indexOf(" ") + 1);
-                            clickDetails.chapter = Integer
-                                    .parseInt(sbDevotionalText.substring(0, sbDevotionalText.indexOf(" ")));
-                            sbDevotionalText.delete(0, sbDevotionalText.indexOf("vs ") + 3);
-                            clickDetails.startVerse = Integer.parseInt(sbDevotionalText.substring(0, sbDevotionalText.indexOf("]")));
-                            sbDevotionalText.delete(0, sbDevotionalText.indexOf("]") + 1);
-                        }
-                        if (noNum && !num) {
-                            clickDetails.displayText = sbDevotionalText.substring(sbDevotionalText.indexOf("[") + 1, sbDevotionalText.indexOf("]"));
-                            spannableStringBuilderDevotionalText.append(sbDevotionalText.substring(0, sbDevotionalText.indexOf("[", matcherNoNumber.start())));
-                            sbDevotionalText.delete(0, sbDevotionalText.indexOf("[", matcherNoNumber.start()) + 1);
-                            clickDetails.bookName = sbDevotionalText.substring(0, 1) + sbDevotionalText.substring(1, sbDevotionalText.indexOf(" "));
-                            sbDevotionalText.delete(0, sbDevotionalText.indexOf(" ") + 1);
-                            clickDetails.chapter = Integer
-                                    .parseInt(sbDevotionalText.substring(0, sbDevotionalText.indexOf(" ")));
-                            sbDevotionalText.delete(0, sbDevotionalText.indexOf("vs ") + 3);
-                            clickDetails.startVerse = Integer.parseInt(sbDevotionalText.substring(0, sbDevotionalText.indexOf("]")));
-                            sbDevotionalText.delete(0, sbDevotionalText.indexOf("]") + 1);
-                        }
-                        final String bookName = clickDetails.bookName;
-                        final int book = db.getBookId(bookName);
-                        final int chapter = clickDetails.chapter;
-                        final int startVerse = clickDetails.startVerse;
-
-                        Button readVerse = (Button) view.findViewById(R.id.btnReadSource);
-                        readVerse.setText("Read " + bookName + " " + chapter + " : " + startVerse);
-                        readVerse.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                DialogFragment newFragment = ShowChapterFragment.newInstance();
-                                Bundle args = new Bundle();
-                                args.putInt(BibleDataContract.CHAPTER, chapter);
-                                args.putInt("START_VERSE", startVerse);
-                                args.putInt(BibleDataContract.BOOK, book);
-                                args.putString("BOOK_NAME", bookName);
-                                args.putInt("LAST_VERSE", 0);
-                                newFragment.setArguments(args);
-                                newFragment.show(getActivity().getSupportFragmentManager(), "dialog");
-
-//                                ListView listView = new ListView(context);
-//                                Cursor verses = db.getVerses(book, chapter);
-//                                ReadCursorAdapter adapter = new ReadCursorAdapter(getContext(),
-//                                        R.layout.read_view_verse,
-//                                        verses,
-//                                        from,
-//                                        to,
-//                                        0);
-//                                listView.setAdapter(adapter);
-//                                AlertDialog.Builder builder = new
-//                                        AlertDialog.Builder(context);
+//    private void doNotLookInMyCode(View view, String devotional[]) {
+//        TextView devotionalTitle = (TextView) view.findViewById(R.id.tvDevotionalTitle);
+//        devotionalTitle.setText(devotional[0]);
+//        devotionalTitle.setVisibility(View.VISIBLE);
+//        receivedText = devotional[1];
 //
-//                                builder.setTitle(book);
-//                                builder.setCancelable(true);
-//                                builder.setPositiveButton("OK", null);
-//                                builder.setView(listView);
-//                                AlertDialog dialog = builder.create();
-////                                dialog.getWindow().setLayout(ViewGroup.LayoutParams.FILL_PARENT,
-////                                        ViewGroup.LayoutParams.WRAP_CONTENT);
-////                                WindowManager.LayoutParams lp;
-////                                try {
-////                                    lp = new WindowManager.LayoutParams();
-////                                    lp.copyFrom(dialog.getWindow().getAttributes());
-////                                    lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-////                                    lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
-////                                    lp.gravity = Gravity.CENTER;
-////                                    dialog.getWindow().setAttributes(lp);
-////                                }catch (NullPointerException ex){
-////                                    ex.printStackTrace();
-////                                }
+////        receivedText = "The Devotional Text for Today [John 15 vs 1-2]" +
+////                "I am the true vine, and my father is the vine dresser [John 15vs 2]" +
+////                "For God so loved this wicked world, that He giveth His only begotten Son," +
+////                " that whosoever believeth in him shall not perish, but have and everlasting life ([John 3 vs 16]).";
+//
+//        SpannableStringBuilder spannableStringBuilderDevotionalText;
+//        StringBuilder sbDevotionalText = new StringBuilder(receivedText);
+//        spannableStringBuilderDevotionalText = new SpannableStringBuilder();
+//
+//        Pattern pattern = Pattern.compile("\\[\\w+\\s\\d+\\s\\w{2}\\s\\d+]");
+//        Pattern pattern1 = Pattern.compile("\\[[^\\d\\W]+\\s\\d+\\s\\w{2}\\s\\d+]");
+//        Pattern pattern2 = Pattern.compile("\\[\\d\\w+\\s\\d+\\s\\w{2}\\s\\d+]");
+//
+////        sbDevotionalText = new StringBuilder("Today's Daily verse is from [John 3 vs 10]. Read and enjoy!" +
+////                "and yesterday's was from " +
+////                "[1John 3 vs 10]. Read and enjoy!" + "Today's Daily verse is from [John 3 vs 10]. Read and enjoy!" +
+////                "and yesterday's was from " +
+////                "[1John 3 vs 10]. Read and enjoy!");
+//        Matcher matcherAnyVerse = pattern.matcher(sbDevotionalText);
+//        Matcher matcherAnyVerse1 = pattern.matcher(sbDevotionalText);
+//        Matcher matcherNoNumber = pattern1.matcher(sbDevotionalText);
+//        Matcher matcherNumber = pattern2.matcher(sbDevotionalText);
+//        if (matcherAnyVerse1.replaceAll("").replaceAll("((?=[^a-z])([^A-Z]))*", "").isEmpty()) {
+//
+//            if (matcherAnyVerse.find()) {
+//                do {
+//                    ClickDetails clickDetails = new ClickDetails();
+//                    try {
+//                        int mnnStart, mnStart;
+//                        boolean num = matcherNumber.find();
+//                        boolean noNum = matcherNoNumber.find();
+//
+//                        if (noNum)
+//                            mnnStart = matcherNoNumber.start();
+//                        else
+//                            mnnStart = 0;
+//
+//                        if (num)
+//                            mnStart = matcherNumber.start();
+//                        else
+//                            mnStart = 0;
+//
+//                        if (num && noNum) {
+//                            if (mnnStart > mnStart) {
+//                                clickDetails.displayText = sbDevotionalText.substring(sbDevotionalText.indexOf("[") + 1, sbDevotionalText.indexOf("[") + 2)
+//                                        + " "
+//                                        + sbDevotionalText.substring(sbDevotionalText.indexOf("[") + 2, sbDevotionalText.indexOf("]", sbDevotionalText.indexOf("[") + 2));
+//                                spannableStringBuilderDevotionalText.append(sbDevotionalText.substring(0, sbDevotionalText.indexOf("[", matcherNumber.start())));
+//                                sbDevotionalText.delete(0, sbDevotionalText.indexOf("[", matcherNumber.start()) + 1);
+//                                clickDetails.bookName = sbDevotionalText.substring(0, 1) + " " + sbDevotionalText.substring(1, sbDevotionalText.indexOf(" "));
+//                                sbDevotionalText.delete(0, sbDevotionalText.indexOf(" ") + 1);
+//                                clickDetails.chapter = Integer
+//                                        .parseInt(sbDevotionalText.substring(0, sbDevotionalText.indexOf(" ")));
+//                                sbDevotionalText.delete(0, sbDevotionalText.indexOf("vs ") + 3);
+//                                clickDetails.startVerse = Integer.parseInt(sbDevotionalText.substring(0, sbDevotionalText.indexOf("]")));
+//                                sbDevotionalText.delete(0, sbDevotionalText.indexOf("]") + 1);
+//                            } else {
+//                                clickDetails.displayText = sbDevotionalText.substring(sbDevotionalText.indexOf("[") + 1, sbDevotionalText.indexOf("]"));
+//                                spannableStringBuilderDevotionalText.append(sbDevotionalText.substring(0, sbDevotionalText.indexOf("[", matcherNoNumber.start())));
+//                                sbDevotionalText.delete(0, sbDevotionalText.indexOf("[", matcherNoNumber.start()) + 1);
+//                                clickDetails.bookName = sbDevotionalText.substring(0, 1) + sbDevotionalText.substring(1, sbDevotionalText.indexOf(" "));
+//                                sbDevotionalText.delete(0, sbDevotionalText.indexOf(" ") + 1);
+//                                clickDetails.chapter = Integer
+//                                        .parseInt(sbDevotionalText.substring(0, sbDevotionalText.indexOf(" ")));
+//                                sbDevotionalText.delete(0, sbDevotionalText.indexOf("vs ") + 3);
+//                                clickDetails.startVerse = Integer.parseInt(sbDevotionalText.substring(0, sbDevotionalText.indexOf("]")));
+//                                sbDevotionalText.delete(0, sbDevotionalText.indexOf("]") + 1);
+//                            }
+//                        } else if (!noNum && num) {
+//                            clickDetails.displayText = sbDevotionalText.substring(sbDevotionalText.indexOf("[") + 1, sbDevotionalText.indexOf("[") + 2)
+//                                    + " "
+//                                    + sbDevotionalText.substring(sbDevotionalText.indexOf("[") + 2, sbDevotionalText.indexOf("]", sbDevotionalText.indexOf("[") + 2));
+//                            spannableStringBuilderDevotionalText.append(sbDevotionalText.substring(0, sbDevotionalText.indexOf("[", matcherNumber.start())));
+//                            sbDevotionalText.delete(0, sbDevotionalText.indexOf("[", matcherNumber.start()) + 1);
+//                            clickDetails.bookName = sbDevotionalText.substring(0, 1) + " " + sbDevotionalText.substring(1, sbDevotionalText.indexOf(" "));
+//                            sbDevotionalText.delete(0, sbDevotionalText.indexOf(" ") + 1);
+//                            clickDetails.chapter = Integer
+//                                    .parseInt(sbDevotionalText.substring(0, sbDevotionalText.indexOf(" ")));
+//                            sbDevotionalText.delete(0, sbDevotionalText.indexOf("vs ") + 3);
+//                            clickDetails.startVerse = Integer.parseInt(sbDevotionalText.substring(0, sbDevotionalText.indexOf("]")));
+//                            sbDevotionalText.delete(0, sbDevotionalText.indexOf("]") + 1);
+//                        }
+//                        if (noNum && !num) {
+//                            clickDetails.displayText = sbDevotionalText.substring(sbDevotionalText.indexOf("[") + 1, sbDevotionalText.indexOf("]"));
+//                            spannableStringBuilderDevotionalText.append(sbDevotionalText.substring(0, sbDevotionalText.indexOf("[", matcherNoNumber.start())));
+//                            sbDevotionalText.delete(0, sbDevotionalText.indexOf("[", matcherNoNumber.start()) + 1);
+//                            clickDetails.bookName = sbDevotionalText.substring(0, 1) + sbDevotionalText.substring(1, sbDevotionalText.indexOf(" "));
+//                            sbDevotionalText.delete(0, sbDevotionalText.indexOf(" ") + 1);
+//                            clickDetails.chapter = Integer
+//                                    .parseInt(sbDevotionalText.substring(0, sbDevotionalText.indexOf(" ")));
+//                            sbDevotionalText.delete(0, sbDevotionalText.indexOf("vs ") + 3);
+//                            clickDetails.startVerse = Integer.parseInt(sbDevotionalText.substring(0, sbDevotionalText.indexOf("]")));
+//                            sbDevotionalText.delete(0, sbDevotionalText.indexOf("]") + 1);
+//                        }
+//                        final String bookName = clickDetails.bookName;
+//                        final int book = db.getBookId(bookName);
+//                        final int chapter = clickDetails.chapter;
+//                        final int startVerse = clickDetails.startVerse;
+//
+//                        Button readVerse = (Button) view.findViewById(R.id.btnReadSource);
+//                        readVerse.setText("Read " + bookName + " " + chapter + " : " + startVerse);
+//                        readVerse.setOnClickListener(new View.OnClickListener() {
+//                            @Override
+//                            public void onClick(View view) {
+//                                DialogFragment newFragment = ShowChapterFragment.newInstance();
+//                                Bundle args = new Bundle();
+//                                args.putInt(BibleDataContract.CHAPTER, chapter);
+//                                args.putInt("START_VERSE", startVerse);
+//                                args.putInt(BibleDataContract.BOOK, book);
+//                                args.putString("BOOK_NAME", bookName);
+//                                args.putInt("LAST_VERSE", 0);
+//                                newFragment.setArguments(args);
+//                                newFragment.show(getActivity().getSupportFragmentManager(), "dialog");
+//
+////                                ListView listView = new ListView(context);
+////                                Cursor verses = db.getVerses(book, chapter);
+////                                ReadCursorAdapter adapter = new ReadCursorAdapter(getContext(),
+////                                        R.layout.read_view_verse,
+////                                        verses,
+////                                        from,
+////                                        to,
+////                                        0);
+////                                listView.setAdapter(adapter);
+////                                AlertDialog.Builder builder = new
+////                                        AlertDialog.Builder(context);
+////
+////                                builder.setTitle(book);
+////                                builder.setCancelable(true);
+////                                builder.setPositiveButton("OK", null);
+////                                builder.setView(listView);
+////                                AlertDialog dialog = builder.create();
+//////                                dialog.getWindow().setLayout(ViewGroup.LayoutParams.FILL_PARENT,
+//////                                        ViewGroup.LayoutParams.WRAP_CONTENT);
+//////                                WindowManager.LayoutParams lp;
+//////                                try {
+//////                                    lp = new WindowManager.LayoutParams();
+//////                                    lp.copyFrom(dialog.getWindow().getAttributes());
+//////                                    lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+//////                                    lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+//////                                    lp.gravity = Gravity.CENTER;
+//////                                    dialog.getWindow().setAttributes(lp);
+//////                                }catch (NullPointerException ex){
+//////                                    ex.printStackTrace();
+//////                                }
+////
+////
+////                                dialog.show();
+//                            }
+//                        });
+//                        readVerse.setVisibility(View.VISIBLE);
+//                        view.findViewById(R.id.tvDevotionalText).setVisibility(View.INVISIBLE);
+//
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                } while (matcherAnyVerse.find());
+//            } else {
+//                spannableStringBuilderDevotionalText.append(sbDevotionalText.toString());
+//            }
+//        } else {
+//
+////        StringBuilder spannableStringBuilderDevotionalText = new StringBuilder();
+//            if (matcherAnyVerse.find()) {
+//                do {
+//                    ClickDetails clickDetails = new ClickDetails();
+//                    try {
+//                        int mnnStart, mnStart;
+//                        boolean num = matcherNumber.find();
+//                        boolean noNum = matcherNoNumber.find();
+//
+//                        if (noNum)
+//                            mnnStart = matcherNoNumber.start();
+//                        else
+//                            mnnStart = 0;
+//
+//                        if (num)
+//                            mnStart = matcherNumber.start();
+//                        else
+//                            mnStart = 0;
 //
 //
-//                                dialog.show();
-                            }
-                        });
-                        readVerse.setVisibility(View.VISIBLE);
-                        view.findViewById(R.id.tvDevotionalText).setVisibility(View.INVISIBLE);
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                } while (matcherAnyVerse.find());
-            } else {
-                spannableStringBuilderDevotionalText.append(sbDevotionalText.toString());
-            }
-        } else {
-
-//        StringBuilder spannableStringBuilderDevotionalText = new StringBuilder();
-            if (matcherAnyVerse.find()) {
-                do {
-                    ClickDetails clickDetails = new ClickDetails();
-                    try {
-                        int mnnStart, mnStart;
-                        boolean num = matcherNumber.find();
-                        boolean noNum = matcherNoNumber.find();
-
-                        if (noNum)
-                            mnnStart = matcherNoNumber.start();
-                        else
-                            mnnStart = 0;
-
-                        if (num)
-                            mnStart = matcherNumber.start();
-                        else
-                            mnStart = 0;
-
-
-                        System.out.println(
-                                "No Num Start : " + mnnStart +
-                                        "Num Start : " + mnStart
-                        );
-                        if (num && noNum) {
-                            if (mnnStart > mnStart) {
-                                clickDetails.displayText = sbDevotionalText.substring(sbDevotionalText.indexOf("[") + 1, sbDevotionalText.indexOf("[") + 2)
-                                        + " "
-                                        + sbDevotionalText.substring(sbDevotionalText.indexOf("[") + 2, sbDevotionalText.indexOf("]", sbDevotionalText.indexOf("[") + 2));
-                                spannableStringBuilderDevotionalText.append(sbDevotionalText.substring(0, sbDevotionalText.indexOf("[", matcherNumber.start())));
-                                sbDevotionalText.delete(0, sbDevotionalText.indexOf("[", matcherNumber.start()) + 1);
-                                clickDetails.bookName = sbDevotionalText.substring(0, 1) + " " + sbDevotionalText.substring(1, sbDevotionalText.indexOf(" "));
-                                sbDevotionalText.delete(0, sbDevotionalText.indexOf(" ") + 1);
-                                clickDetails.chapter = Integer
-                                        .parseInt(sbDevotionalText.substring(0, sbDevotionalText.indexOf(" ")));
-                                sbDevotionalText.delete(0, sbDevotionalText.indexOf("vs ") + 3);
-                                clickDetails.startVerse = Integer.parseInt(sbDevotionalText.substring(0, sbDevotionalText.indexOf("]")));
-                                sbDevotionalText.delete(0, sbDevotionalText.indexOf("]") + 1);
-                            } else {
-                                clickDetails.displayText = sbDevotionalText.substring(sbDevotionalText.indexOf("[") + 1, sbDevotionalText.indexOf("]"));
-                                spannableStringBuilderDevotionalText.append(sbDevotionalText.substring(0, sbDevotionalText.indexOf("[", matcherNoNumber.start())));
-                                sbDevotionalText.delete(0, sbDevotionalText.indexOf("[", matcherNoNumber.start()) + 1);
-                                clickDetails.bookName = sbDevotionalText.substring(0, 1) + sbDevotionalText.substring(1, sbDevotionalText.indexOf(" "));
-                                sbDevotionalText.delete(0, sbDevotionalText.indexOf(" ") + 1);
-                                clickDetails.chapter = Integer
-                                        .parseInt(sbDevotionalText.substring(0, sbDevotionalText.indexOf(" ")));
-                                sbDevotionalText.delete(0, sbDevotionalText.indexOf("vs ") + 3);
-                                clickDetails.startVerse = Integer.parseInt(sbDevotionalText.substring(0, sbDevotionalText.indexOf("]")));
-                                sbDevotionalText.delete(0, sbDevotionalText.indexOf("]") + 1);
-                            }
-                        } else if (!noNum && num) {
-                            clickDetails.displayText = sbDevotionalText.substring(sbDevotionalText.indexOf("[") + 1, sbDevotionalText.indexOf("[") + 2)
-                                    + " "
-                                    + sbDevotionalText.substring(sbDevotionalText.indexOf("[") + 2, sbDevotionalText.indexOf("]", sbDevotionalText.indexOf("[") + 2));
-                            spannableStringBuilderDevotionalText.append(sbDevotionalText.substring(0, sbDevotionalText.indexOf("[", matcherNumber.start())));
-                            sbDevotionalText.delete(0, sbDevotionalText.indexOf("[", matcherNumber.start()) + 1);
-                            clickDetails.bookName = sbDevotionalText.substring(0, 1) + " " + sbDevotionalText.substring(1, sbDevotionalText.indexOf(" "));
-                            sbDevotionalText.delete(0, sbDevotionalText.indexOf(" ") + 1);
-                            clickDetails.chapter = Integer
-                                    .parseInt(sbDevotionalText.substring(0, sbDevotionalText.indexOf(" ")));
-                            sbDevotionalText.delete(0, sbDevotionalText.indexOf("vs ") + 3);
-                            clickDetails.startVerse = Integer.parseInt(sbDevotionalText.substring(0, sbDevotionalText.indexOf("]")));
-                            sbDevotionalText.delete(0, sbDevotionalText.indexOf("]") + 1);
-                        }
-                        if (noNum && !num) {
-                            clickDetails.displayText = sbDevotionalText.substring(sbDevotionalText.indexOf("[") + 1, sbDevotionalText.indexOf("]"));
-                            spannableStringBuilderDevotionalText.append(sbDevotionalText.substring(0, sbDevotionalText.indexOf("[", matcherNoNumber.start())));
-                            sbDevotionalText.delete(0, sbDevotionalText.indexOf("[", matcherNoNumber.start()) + 1);
-                            clickDetails.bookName = sbDevotionalText.substring(0, 1) + sbDevotionalText.substring(1, sbDevotionalText.indexOf(" "));
-                            sbDevotionalText.delete(0, sbDevotionalText.indexOf(" ") + 1);
-                            clickDetails.chapter = Integer
-                                    .parseInt(sbDevotionalText.substring(0, sbDevotionalText.indexOf(" ")));
-                            sbDevotionalText.delete(0, sbDevotionalText.indexOf("vs ") + 3);
-                            clickDetails.startVerse = Integer.parseInt(sbDevotionalText.substring(0, sbDevotionalText.indexOf("]")));
-                            sbDevotionalText.delete(0, sbDevotionalText.indexOf("]") + 1);
-                        }
-                        final String bookName = clickDetails.bookName;
-                        final int book = db.getBookId(bookName);
-                        final int chapter = clickDetails.chapter;
-                        final int startVerse = clickDetails.startVerse;
-
-                        int startIndex = spannableStringBuilderDevotionalText.length();
-                        spannableStringBuilderDevotionalText.append(
-                                clickDetails.displayText
-                        );
-                        int endIndex = spannableStringBuilderDevotionalText.length();
-                        //                sbDevotionalText.delete(sbDevotionalText.indexOf("["), sbDevotionalText.indexOf("]")+1);
-                        ClickableSpan clickableSpan = new ClickableSpan() {
-                            @Override
-                            public void onClick(View textView) {
-                                if (getActivity() == null)
-                                    return;
-                                DialogFragment newFragment = ReadFragment.newInstance();
-                                Bundle args = new Bundle();
-                                args.putInt("CHAPTER", chapter);
-                                args.putInt("VERSE", startVerse);
-                                args.putInt("BOOK", book);
-                                args.putString("BOOK_NAME", bookName);
-                                args.putInt("LAST_VERSE", 0);
-                                newFragment.setArguments(args);
-                                newFragment.show(getActivity().getSupportFragmentManager(), "dialog");
-
-                            }
-                        };
-                        spannableStringBuilderDevotionalText.setSpan(clickableSpan, startIndex, endIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    } finally {
-                        matcherAnyVerse = pattern.matcher(sbDevotionalText);
-                        matcherNoNumber = pattern1.matcher(sbDevotionalText);
-                        matcherNumber = pattern2.matcher(sbDevotionalText);
-
-                        if (sbDevotionalText.indexOf("[") < 0)
-                            spannableStringBuilderDevotionalText.append(sbDevotionalText);
-                    }
-                } while (matcherAnyVerse.find());
-            } else {
-                spannableStringBuilderDevotionalText.append(sbDevotionalText.toString());
-            }
-
-//        //For Click
-//        myString.setSpan(clickableSpan,startIndex,lastIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+//                        System.out.println(
+//                                "No Num Start : " + mnnStart +
+//                                        "Num Start : " + mnStart
+//                        );
+//                        if (num && noNum) {
+//                            if (mnnStart > mnStart) {
+//                                clickDetails.displayText = sbDevotionalText.substring(sbDevotionalText.indexOf("[") + 1, sbDevotionalText.indexOf("[") + 2)
+//                                        + " "
+//                                        + sbDevotionalText.substring(sbDevotionalText.indexOf("[") + 2, sbDevotionalText.indexOf("]", sbDevotionalText.indexOf("[") + 2));
+//                                spannableStringBuilderDevotionalText.append(sbDevotionalText.substring(0, sbDevotionalText.indexOf("[", matcherNumber.start())));
+//                                sbDevotionalText.delete(0, sbDevotionalText.indexOf("[", matcherNumber.start()) + 1);
+//                                clickDetails.bookName = sbDevotionalText.substring(0, 1) + " " + sbDevotionalText.substring(1, sbDevotionalText.indexOf(" "));
+//                                sbDevotionalText.delete(0, sbDevotionalText.indexOf(" ") + 1);
+//                                clickDetails.chapter = Integer
+//                                        .parseInt(sbDevotionalText.substring(0, sbDevotionalText.indexOf(" ")));
+//                                sbDevotionalText.delete(0, sbDevotionalText.indexOf("vs ") + 3);
+//                                clickDetails.startVerse = Integer.parseInt(sbDevotionalText.substring(0, sbDevotionalText.indexOf("]")));
+//                                sbDevotionalText.delete(0, sbDevotionalText.indexOf("]") + 1);
+//                            } else {
+//                                clickDetails.displayText = sbDevotionalText.substring(sbDevotionalText.indexOf("[") + 1, sbDevotionalText.indexOf("]"));
+//                                spannableStringBuilderDevotionalText.append(sbDevotionalText.substring(0, sbDevotionalText.indexOf("[", matcherNoNumber.start())));
+//                                sbDevotionalText.delete(0, sbDevotionalText.indexOf("[", matcherNoNumber.start()) + 1);
+//                                clickDetails.bookName = sbDevotionalText.substring(0, 1) + sbDevotionalText.substring(1, sbDevotionalText.indexOf(" "));
+//                                sbDevotionalText.delete(0, sbDevotionalText.indexOf(" ") + 1);
+//                                clickDetails.chapter = Integer
+//                                        .parseInt(sbDevotionalText.substring(0, sbDevotionalText.indexOf(" ")));
+//                                sbDevotionalText.delete(0, sbDevotionalText.indexOf("vs ") + 3);
+//                                clickDetails.startVerse = Integer.parseInt(sbDevotionalText.substring(0, sbDevotionalText.indexOf("]")));
+//                                sbDevotionalText.delete(0, sbDevotionalText.indexOf("]") + 1);
+//                            }
+//                        } else if (!noNum && num) {
+//                            clickDetails.displayText = sbDevotionalText.substring(sbDevotionalText.indexOf("[") + 1, sbDevotionalText.indexOf("[") + 2)
+//                                    + " "
+//                                    + sbDevotionalText.substring(sbDevotionalText.indexOf("[") + 2, sbDevotionalText.indexOf("]", sbDevotionalText.indexOf("[") + 2));
+//                            spannableStringBuilderDevotionalText.append(sbDevotionalText.substring(0, sbDevotionalText.indexOf("[", matcherNumber.start())));
+//                            sbDevotionalText.delete(0, sbDevotionalText.indexOf("[", matcherNumber.start()) + 1);
+//                            clickDetails.bookName = sbDevotionalText.substring(0, 1) + " " + sbDevotionalText.substring(1, sbDevotionalText.indexOf(" "));
+//                            sbDevotionalText.delete(0, sbDevotionalText.indexOf(" ") + 1);
+//                            clickDetails.chapter = Integer
+//                                    .parseInt(sbDevotionalText.substring(0, sbDevotionalText.indexOf(" ")));
+//                            sbDevotionalText.delete(0, sbDevotionalText.indexOf("vs ") + 3);
+//                            clickDetails.startVerse = Integer.parseInt(sbDevotionalText.substring(0, sbDevotionalText.indexOf("]")));
+//                            sbDevotionalText.delete(0, sbDevotionalText.indexOf("]") + 1);
+//                        }
+//                        if (noNum && !num) {
+//                            clickDetails.displayText = sbDevotionalText.substring(sbDevotionalText.indexOf("[") + 1, sbDevotionalText.indexOf("]"));
+//                            spannableStringBuilderDevotionalText.append(sbDevotionalText.substring(0, sbDevotionalText.indexOf("[", matcherNoNumber.start())));
+//                            sbDevotionalText.delete(0, sbDevotionalText.indexOf("[", matcherNoNumber.start()) + 1);
+//                            clickDetails.bookName = sbDevotionalText.substring(0, 1) + sbDevotionalText.substring(1, sbDevotionalText.indexOf(" "));
+//                            sbDevotionalText.delete(0, sbDevotionalText.indexOf(" ") + 1);
+//                            clickDetails.chapter = Integer
+//                                    .parseInt(sbDevotionalText.substring(0, sbDevotionalText.indexOf(" ")));
+//                            sbDevotionalText.delete(0, sbDevotionalText.indexOf("vs ") + 3);
+//                            clickDetails.startVerse = Integer.parseInt(sbDevotionalText.substring(0, sbDevotionalText.indexOf("]")));
+//                            sbDevotionalText.delete(0, sbDevotionalText.indexOf("]") + 1);
+//                        }
+//                        final String bookName = clickDetails.bookName;
+//                        final int book = db.getBookId(bookName);
+//                        final int chapter = clickDetails.chapter;
+//                        final int startVerse = clickDetails.startVerse;
 //
-//        //For UnderLine
-//        myString.setSpan(new UnderlineSpan(),startIndex,lastIndex,0);
+//                        int startIndex = spannableStringBuilderDevotionalText.length();
+//                        spannableStringBuilderDevotionalText.append(
+//                                clickDetails.displayText
+//                        );
+//                        int endIndex = spannableStringBuilderDevotionalText.length();
+//                        //                sbDevotionalText.delete(sbDevotionalText.indexOf("["), sbDevotionalText.indexOf("]")+1);
+//                        ClickableSpan clickableSpan = new ClickableSpan() {
+//                            @Override
+//                            public void onClick(View textView) {
+//                                if (getActivity() == null)
+//                                    return;
+//                                DialogFragment newFragment = ReadFragment.newInstance();
+//                                Bundle args = new Bundle();
+//                                args.putInt("CHAPTER", chapter);
+//                                args.putInt("VERSE", startVerse);
+//                                args.putInt("BOOK", book);
+//                                args.putString("BOOK_NAME", bookName);
+//                                args.putInt("LAST_VERSE", 0);
+//                                newFragment.setArguments(args);
+//                                newFragment.show(getActivity().getSupportFragmentManager(), "dialog");
 //
-//        //For Bold
-//        myString.setSpan(new StyleSpan(Typeface.BOLD),startIndex,lastIndex,0);
-
-            //Finally you can set to textView.
-            TextView tvDevotionalText = (TextView) view.findViewById(R.id.tvDevotionalText);
-            tvDevotionalText.setText(spannableStringBuilderDevotionalText);
-            System.out.println(spannableStringBuilderDevotionalText);
-            tvDevotionalText.setMovementMethod(LinkMovementMethod.getInstance());
-            tvDevotionalText.setVisibility(View.VISIBLE);
-            view.findViewById(R.id.btnReadSource).setVisibility(View.INVISIBLE);
-        }
-
-    }
+//                            }
+//                        };
+//                        spannableStringBuilderDevotionalText.setSpan(clickableSpan, startIndex, endIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//
+//
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    } finally {
+//                        matcherAnyVerse = pattern.matcher(sbDevotionalText);
+//                        matcherNoNumber = pattern1.matcher(sbDevotionalText);
+//                        matcherNumber = pattern2.matcher(sbDevotionalText);
+//
+//                        if (sbDevotionalText.indexOf("[") < 0)
+//                            spannableStringBuilderDevotionalText.append(sbDevotionalText);
+//                    }
+//                } while (matcherAnyVerse.find());
+//            } else {
+//                spannableStringBuilderDevotionalText.append(sbDevotionalText.toString());
+//            }
+//
+////        //For Click
+////        myString.setSpan(clickableSpan,startIndex,lastIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+////
+////        //For UnderLine
+////        myString.setSpan(new UnderlineSpan(),startIndex,lastIndex,0);
+////
+////        //For Bold
+////        myString.setSpan(new StyleSpan(Typeface.BOLD),startIndex,lastIndex,0);
+//
+//            //Finally you can set to textView.
+//            TextView tvDevotionalText = (TextView) view.findViewById(R.id.tvDevotionalText);
+//            tvDevotionalText.setText(spannableStringBuilderDevotionalText);
+//            System.out.println(spannableStringBuilderDevotionalText);
+//            tvDevotionalText.setMovementMethod(LinkMovementMethod.getInstance());
+//            tvDevotionalText.setVisibility(View.VISIBLE);
+//            view.findViewById(R.id.btnReadSource).setVisibility(View.INVISIBLE);
+//        }
+//
+//    }
 }

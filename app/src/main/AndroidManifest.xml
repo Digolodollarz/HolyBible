@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     package="tech.diggle.apps.bible.bhaibheridzvenemuchishona">
 
     <!--<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />-->
@@ -22,30 +21,69 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <intent-filter
-                android:autoVerify="true"
-                android:label="read_bible">
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <!-- Accepts URIs that begin with "http://www.diggle.tech” -->
-                <data android:scheme="http"
-                    android:host="www.diggle.tech"
-                    android:pathPrefix="/bible" />
-                <data android:scheme="https"
-                    android:host="www.diggle.tech"
-                    android:pathPrefix="/bible" />
-                <data android:scheme="http"
-                    android:host="diggle.tech"
-                    android:pathPrefix="/bible" />
-                <data android:scheme="https"
-                    android:host="diggle.tech"
-                    android:pathPrefix="/bible" />
-                <!-- note that the leading "/" is required for pathPrefix-->
-                <!-- Accepts URIs that begin with "example://gizmos” -->
-                <!--<data android:scheme="example"-->
-                    <!--android:host="gizmos" />-->
 
+                <data
+                    android:scheme="http"
+                    android:host="www.diggle.tech"
+                    android:pathPrefix="/bible" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="http"
+                    android:host="diggle.tech"
+                    android:pathPrefix="/bible" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="https"
+                    android:host="www.diggle.tech"
+                    android:pathPrefix="/bible" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="https"
+                    android:host="diggle.tech"
+                    android:pathPrefix="/bible" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="http"
+                    android:host="bible.diggle.tech" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="https"
+                    android:host="bible.diggle.tech" />
             </intent-filter>
         </activity>
         <activity android:name=".ShareActivity" />
