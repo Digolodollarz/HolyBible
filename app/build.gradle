@@ -8,6 +8,16 @@ android {
             storeFile file('C:/Users/DiggeDollarz/OneDrive/Documents/android-keys/My Key Store.jks')
             storePassword 'ru3#l3aH#$'
         }
+        debug {
+            keyAlias 'debug'
+            keyPassword 'thedebug'
+        }
+        debugging {
+            keyAlias 'debug'
+            keyPassword 'diggletech'
+            storeFile file('C:/Users/edmoreg/Google Drive/COde/android-keys.jks')
+            storePassword 'diggletech'
+        }
     }
     compileSdkVersion 25
     buildToolsVersion "25.0.0"
@@ -29,9 +39,14 @@ android {
         beta {
             debuggable false
             signingConfig signingConfigs.config
+            minifyEnabled false
         }
         debug {
             signingConfig signingConfigs.config
+        }
+        unsigned {
+            debuggable true
+            signingConfig signingConfigs.debugging
         }
     }
     productFlavors {
